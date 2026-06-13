@@ -1,36 +1,52 @@
--- ~/.config/nvim/plugin/10-harpoon.lua
+-- plugin/harpoon.lua
+-- Harpoon 2 — branch harpoon2 (o branch main está deprecated)
+-- API completamente diferente da v1: harpoon:list():add() em vez de mark.add_file()
 
 vim.schedule(function()
-	vim.pack.add({ "https://github.com/ThePrimeagen/harpoon" })
+	vim.pack.add({
+		-- IMPORTANTE: aponta para o branch harpoon2, não o main
+		{ src = "https://github.com/ThePrimeagen/harpoon", version = "harpoon2" },
+		"https://github.com/nvim-lua/plenary.nvim",
+	})
 
-	-- O Harpoon é dividido em dois motores: o de marcação (mark) e o de interface (ui)
-	local ok_mark, mark = pcall(require, "harpoon.mark")
-	local ok_ui, ui = pcall(require, "harpoon.ui")
-	if not (ok_mark and ok_ui) then
+	local ok, harpoon = pcall(require, "harpoon")
+	if not ok then
 		return
 	end
 
-	-- ==========================================
-	-- ATALHOS NINJAS DE TELETRANSPORTE
-	-- ==========================================
+	harpoon:setup({
+		settings = {
+			save_on_toggle = true,
+			sync_on_ui_close = true,
+		},
+	})
 
-	-- 1. "Fisga" o arquivo atual e joga na sua lista (Espaço + a)
-	vim.keymap.set("n", "<leader>a", mark.add_file, { desc = "Harpoon: Adicionar arquivo" })
+	local list = function()
+		return harpoon:list()
+	end
 
-	-- 2. Abre o menu rápido de vidro fosco para ver seus arquivos marcados (Ctrl + e)
-	vim.keymap.set("n", "<C-e>", ui.toggle_quick_menu, { desc = "Harpoon: Menu Rápido" })
+	-- Adicionar arquivo atual à lista
+	vim.keymap.set("n", "<leader>a", function()
+		list():add()
+	end, { desc = "Harpoon: Adicionar arquivo" })
 
-	-- 3. Pula direto para os arquivos sem nem abrir o menu (Ctrl + 1, 2, 3, 4)
-	vim.keymap.set("n", "<C-1>", function()
-		ui.nav_file(1)
-	end, { desc = "Harpoon: Ir para Arquivo 1" })
-	vim.keymap.set("n", "<C-2>", function()
-		ui.nav_file(2)
-	end, { desc = "Harpoon: Ir para Arquivo 2" })
-	vim.keymap.set("n", "<C-3>", function()
-		ui.nav_file(3)
-	end, { desc = "Harpoon: Ir para Arquivo 3" })
-	vim.keymap.set("n", "<C-4>", function()
-		ui.nav_file(4)
-	end, { desc = "Harpoon: Ir para Arquivo 4" })
+	-- Abrir o menu rápido
+	vim.keymap.set("n", "<C-e>", function()
+		harpoon.ui:toggle_quick_menu(list())
+	end, { desc = "Harpoon: Menu rápido" })
+
+	-- Navegar direto para os arquivos 1-4
+	for i = 1, 4 do
+		vim.keymap.set("n", "<C-" .. i .. ">", function()
+			list():select(i)
+		end, { desc = "Harpoon: Ir para arquivo " .. i })
+	end
+
+	-- Navegar para próximo/anterior da lista
+	vim.keymap.set("n", "<leader>hn", function()
+		list():next()
+	end, { desc = "Harpoon: Próximo" })
+	vim.keymap.set("n", "<leader>hp", function()
+		list():prev()
+	end, { desc = "Harpoon: Anterior" })
 end)

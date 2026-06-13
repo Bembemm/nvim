@@ -1,4 +1,5 @@
--- ~/.config/nvim/plugin/07-conform.lua
+-- plugin/conform.lua
+-- Formatação automática ao salvar
 
 vim.schedule(function()
 	vim.pack.add({ "https://github.com/stevearc/conform.nvim" })
@@ -9,15 +10,27 @@ vim.schedule(function()
 	end
 
 	conform.setup({
-		-- Avisa quais programas usar para cada linguagem
 		formatters_by_ft = {
 			lua = { "stylua" },
-			python = { "black" },
+			python = { "black", "isort" },
+			javascript = { "prettierd", "prettier", stop_after_first = true },
+			typescript = { "prettierd", "prettier", stop_after_first = true },
+			javascriptreact = { "prettierd", "prettier", stop_after_first = true },
+			typescriptreact = { "prettierd", "prettier", stop_after_first = true },
+			css = { "prettier" },
+			html = { "prettier" },
+			json = { "prettier" },
+			yaml = { "prettier" },
+			markdown = { "prettier" },
+			bash = { "shfmt" },
+			sh = { "shfmt" },
 		},
-		-- O grande segredo: Formata sozinho toda vez que você salvar o arquivo!
+		default_format_opts = {
+			lsp_format = "fallback",
+		},
 		format_on_save = {
 			timeout_ms = 500,
-			lsp_fallback = true,
+			quiet = true,
 		},
 	})
 end)
