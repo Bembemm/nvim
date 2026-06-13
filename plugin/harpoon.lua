@@ -1,31 +1,48 @@
-local harpoon_path = vim.fn.stdpath("data") .. "/site/pack/harpoon/start/harpoon"
+-- Harpoon2 precisa ser instalado via branch específico.
+-- vim.pack.add não suporta branches, então usamos o método nativo do Neovim.
+local harpoon_path = vim.fn.stdpath("data") .. "/site/pack/deps/start/harpoon"
+local plenary_path = vim.fn.stdpath("data") .. "/site/pack/deps/start/plenary.nvim"
 
--- Se o harpoon2 ainda não está no disco, clona o branch correto
-if not vim.uv.fs_stat(harpoon_path) then
-	vim.notify("Harpoon2: instalando...", vim.log.levels.INFO)
-	local out = vim.fn.system({
-		"git",
-		"clone",
-		"--branch",
-		"harpoon2",
-		"--depth",
-		"1",
-		"https://github.com/ThePrimeagen/harpoon",
-		harpoon_path,
-	})
-	if vim.v.shell_error ~= 0 then
-		vim.notify("Harpoon2: falha ao instalar:\n" .. out, vim.log.levels.ERROR)
-		return
+local function clone(url, path)
+	if not vim.uv.fs_stat(path) then
+		local out = vim.fn.system({
+			"git",
+			"clone",
+			"--branch",
+			"harpoon2",
+			"--depth",
+			"1",
+			url,
+			path,
+		})
+		if vim.v.shell_error ~= 0 then
+			vim.notify("Harpoon2: falha ao instalar:\n" .. out, vim.log.levels.ERROR)
+			return false
+		end
+		vim.notify("Harpoon2: instalado! Reinicie o Neovim.", vim.log.levels.INFO)
+		return false -- pede reinício antes de continuar
 	end
-	vim.opt.runtimepath:append(harpoon_path)
-	vim.notify("Harpoon2: instalado! Reinicie o Neovim.", vim.log.levels.INFO)
-	return
+	return true
 end
 
--- Garante que o path está no runtimepath (para quando já está instalado)
-vim.opt.runtimepath:append(harpoon_path)
+local function clone_plenary(url, path)
+	if not vim.uv.fs_stat(path) then
+		local out = vim.fn.system({ "git", "clone", "--depth", "1", url, path })
+		if vim.v.shell_error ~= 0 then
+			vim.notify("plenary.nvim: falha ao instalar:\n" .. out, vim.log.levels.ERROR)
+			return false
+		end
+		return false
+	end
+	return true
+end
 
-vim.pack.add({ "https://github.com/nvim-lua/plenary.nvim" })
+local ok_p = clone_plenary("https://github.com/nvim-lua/plenary.nvim", plenary_path)
+local ok_h = clone("https://github.com/ThePrimeagen/harpoon", harpoon_path)
+
+if not (ok_p and ok_h) then
+	return
+end
 
 local harpoon = require("harpoon")
 
@@ -36,7 +53,7 @@ harpoon:setup({
 	},
 })
 
--- Extend: abre em split vertical/horizontal e tab direto do menu
+-- Extend: abre em split vertical/horizontal direto do menu
 harpoon:extend({
 	UI_CREATE = function(cx)
 		vim.keymap.set("n", "<C-v>", function()
@@ -52,27 +69,24 @@ local list = function()
 	return harpoon:list()
 end
 
--- Adicionar arquivo atual à lista
 vim.keymap.set("n", "<leader>a", function()
 	list():add()
 end, { desc = "Harpoon: Adicionar arquivo" })
 
--- Abrir o menu rápido
 vim.keymap.set("n", "<C-e>", function()
 	harpoon.ui:toggle_quick_menu(list())
 end, { desc = "Harpoon: Menu rápido" })
 
--- Navegar direto para os arquivos 1-4
 for i = 1, 4 do
 	vim.keymap.set("n", "<C-" .. i .. ">", function()
 		list():select(i)
 	end, { desc = "Harpoon: Ir para arquivo " .. i })
 end
 
--- Navegar para próximo/anterior da lista
 vim.keymap.set("n", "<leader>hn", function()
 	list():next()
 end, { desc = "Harpoon: Próximo" })
+
 vim.keymap.set("n", "<leader>hp", function()
 	list():prev()
 end, { desc = "Harpoon: Anterior" })

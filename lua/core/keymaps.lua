@@ -39,8 +39,3 @@ keymap.set("v", "D", "yP", { desc = "Duplicar seleção" })
 
 -- Terminal: sair do modo insert com Esc
 keymap.set("t", "<Esc>", "<C-\\><C-N>", { desc = "Sair do modo terminal" })
-
--- Snippets nativos (0.10+)
-keymap.set({ "i", "s" }, "<Tab>", "<Cmd>lua vim.snippet.jump(1)<CR>", { desc = "Próximo placeholder" })
-keymap.set({ "i", "s" }, "<S-Tab>", "<Cmd>lua vim.snippet.jump(-1)<CR>", { desc = "Placeholder anterior" })
-keymap.set({ "i", "s" }, "<C-e>", "<Cmd>lua vim.snippet.exit()<CR>", { desc = "Sair do snippet" })
