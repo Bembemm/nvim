@@ -5,41 +5,28 @@ require("nvim-treesitter").setup({
 })
 
 require("nvim-treesitter").install({
-	"c",
+	-- Neovim essencial
 	"lua",
 	"vim",
 	"vimdoc",
 	"query",
-	"markdown",
-	"css",
-	"html",
-	"javascript",
+	-- Seu foco
+	"python",
+	"sql",
 	"latex",
-	"scss",
-	"svelte",
-	"tsx",
-	"typst",
-	"vue",
+	"markdown",
 	"regex",
 })
 
--- Highlighting + indentação num único autocmd (sem duplicação de lista)
 local ts_filetypes = {
-	"c",
 	"lua",
 	"vim",
 	"vimdoc",
 	"query",
-	"markdown",
-	"css",
-	"html",
-	"javascript",
+	"python",
+	"sql",
 	"latex",
-	"scss",
-	"svelte",
-	"tsx",
-	"typst",
-	"vue",
+	"markdown",
 	"regex",
 }
 

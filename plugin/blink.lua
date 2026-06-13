@@ -37,7 +37,15 @@ blink.setup({
 local capabilities = blink.get_lsp_capabilities()
 vim.lsp.config("*", { capabilities = capabilities })
 
+-- Python
 vim.lsp.config("pyright", {})
+vim.lsp.enable("pyright")
+
+-- LaTeX
+vim.lsp.config("texlab", {})
+vim.lsp.enable("texlab")
+
+-- Lua (editar a própria config do Neovim)
 vim.lsp.config("lua_ls", {
 	settings = {
 		Lua = {
@@ -51,8 +59,6 @@ vim.lsp.config("lua_ls", {
 		},
 	},
 })
-
-vim.lsp.enable("pyright")
 vim.lsp.enable("lua_ls")
 
 vim.diagnostic.config({
