@@ -1,109 +1,89 @@
--- plugin/blink.lua
--- Completion (blink.cmp) + LSP nativo (0.11+)
--- Não instale nvim-cmp, cmp-nvim-lsp ou LuaSnip junto — conflito com blink.
+vim.pack.add({
+	"https://github.com/saghen/blink.lib",
+	"https://github.com/saghen/blink.cmp",
+})
 
-vim.schedule(function()
-	vim.pack.add({
-		"https://github.com/saghen/blink.lib",
-		"https://github.com/saghen/blink.cmp",
-	})
+local blink = require("blink.cmp")
 
-	local ok, blink = pcall(require, "blink.cmp")
-	if not ok then
-		return
-	end
+blink.setup({
+	keymap = { preset = "default" },
 
-	blink.setup({
-		keymap = { preset = "default" },
+	appearance = {
+		nerd_font_variant = "mono",
+	},
 
-		appearance = {
-			nerd_font_variant = "mono",
+	snippets = { preset = "default" },
+
+	sources = {
+		default = { "lsp", "path", "snippets", "buffer" },
+	},
+
+	signature = { enabled = true },
+
+	completion = {
+		documentation = {
+			auto_show = true,
+			window = { border = "rounded" },
 		},
-
-		-- Snippets nativos do Neovim (não precisa do LuaSnip)
-		snippets = { preset = "default" },
-
-		sources = {
-			default = { "lsp", "path", "snippets", "buffer" },
-		},
-
-		-- Mostra os parâmetros da função enquanto você digita
-		signature = { enabled = true },
-
-		completion = {
-			documentation = {
-				auto_show = true,
-				window = { border = "rounded" },
-			},
-			menu = {
-				draw = {
-					treesitter = { "lsp" },
-					columns = { { "label", "label_description", gap = 1 }, { "kind_icon", "kind" } },
-				},
+		menu = {
+			draw = {
+				treesitter = { "lsp" },
+				columns = { { "label", "label_description", gap = 1 }, { "kind_icon", "kind" } },
 			},
 		},
-	})
+	},
+})
 
-	-- Passa as capacidades do blink para todos os LSPs
-	local capabilities = blink.get_lsp_capabilities()
-	vim.lsp.config("*", { capabilities = capabilities })
+local capabilities = blink.get_lsp_capabilities()
+vim.lsp.config("*", { capabilities = capabilities })
 
-	-- Configuração dos servidores LSP
-	vim.lsp.config("pyright", {})
-	vim.lsp.config("lua_ls", {
-		settings = {
-			Lua = {
-				runtime = { version = "LuaJIT" },
-				diagnostics = { globals = { "vim" } },
-				workspace = {
-					library = vim.api.nvim_get_runtime_file("", true),
-					checkThirdParty = false,
-				},
-				format = { enable = false },
+vim.lsp.config("pyright", {})
+vim.lsp.config("lua_ls", {
+	settings = {
+		Lua = {
+			runtime = { version = "LuaJIT" },
+			diagnostics = { globals = { "vim" } },
+			workspace = {
+				library = vim.api.nvim_get_runtime_file("", true),
+				checkThirdParty = false,
 			},
+			format = { enable = false },
 		},
-	})
+	},
+})
 
-	vim.lsp.enable("pyright")
-	vim.lsp.enable("lua_ls")
+vim.lsp.enable("pyright")
+vim.lsp.enable("lua_ls")
 
-	-- Configuração de diagnósticos visuais
-	vim.diagnostic.config({
-		virtual_text = {
-			prefix = "●",
-			source = "if_many",
-			spacing = 2,
-		},
-		signs = true,
-		underline = true,
-		update_in_insert = false,
-		severity_sort = true,
-		float = {
-			source = "if_many",
-			border = "rounded",
-			header = "",
-			prefix = "",
-			focusable = false,
-		},
-	})
+vim.diagnostic.config({
+	virtual_text = {
+		prefix = "●",
+		source = "if_many",
+		spacing = 2,
+	},
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
+	float = {
+		source = "if_many",
+		border = "rounded",
+		header = "",
+		prefix = "",
+		focusable = false,
+	},
+})
 
-	-- Keymaps LSP: só ativam quando um servidor está anexado ao buffer
-	vim.api.nvim_create_autocmd("LspAttach", {
-		callback = function(ev)
-			local buf = ev.buf
-			vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = buf, desc = "Ir para definição" })
-			vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { buffer = buf, desc = "Ir para declaração" })
-			vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = buf, desc = "Documentação" })
-			vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { buffer = buf, desc = "Ir para implementação" })
-			vim.keymap.set("n", "gr", vim.lsp.buf.references, { buffer = buf, desc = "Referências" })
-			vim.keymap.set(
-				"n",
-				"<leader>k",
-				vim.lsp.buf.signature_help,
-				{ buffer = buf, desc = "Assinatura da função" }
-			)
-			vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = buf, desc = "Renomear símbolo" })
-			vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = buf, desc = "Code action" })
-		end,
-	})
-end)
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(ev)
+		local buf = ev.buf
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, { buffer = buf, desc = "Ir para definição" })
+		vim.keymap.set("n", "gD", vim.lsp.buf.declaration, { buffer = buf, desc = "Ir para declaração" })
+		vim.keymap.set("n", "K", vim.lsp.buf.hover, { buffer = buf, desc = "Documentação" })
+		vim.keymap.set("n", "gi", vim.lsp.buf.implementation, { buffer = buf, desc = "Ir para implementação" })
+		vim.keymap.set("n", "gr", vim.lsp.buf.references, { buffer = buf, desc = "Referências" })
+		vim.keymap.set("n", "<leader>k", vim.lsp.buf.signature_help, { buffer = buf, desc = "Assinatura da função" })
+		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, { buffer = buf, desc = "Renomear símbolo" })
+		vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, { buffer = buf, desc = "Code action" })
+	end,
+})

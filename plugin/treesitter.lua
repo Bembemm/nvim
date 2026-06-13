@@ -1,19 +1,72 @@
--- Coloca todo o bloco na "fila de espera" para rodar só depois que a tela do Neovim aparecer (deixa a abertura instantânea)
-vim.schedule(function()
-	-- Baixa o motor de highlight avançado
-	vim.pack.add({ "https://github.com/nvim-treesitter/nvim-treesitter" })
+vim.pack.add({ "https://github.com/nvim-treesitter/nvim-treesitter" })
+require("nvim-treesitter").setup({
+	install_dir = vim.fn.stdpath("data") .. "/site",
+})
+require("nvim-treesitter").install({
+	"c",
+	"lua",
+	"vim",
+	"vimdoc",
+	"query",
+	"markdown",
+	"css",
+	"html",
+	"javascript",
+	"latex",
+	"scss",
+	"svelte",
+	"tsx",
+	"typst",
+	"vue",
+	"regex",
+})
 
-	-- Tenta carregar o plugin. Se ele ainda estiver sendo baixado, o 'ok' será falso,
-	-- e o 'return' cancela o código, evitando aquele erro vermelho na tela.
-	local ok, configs = pcall(require, "nvim-treesitter.configs")
-	if not ok then
-		return
-	end
+-- Highlighting
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = {
+		"c",
+		"lua",
+		"vim",
+		"vimdoc",
+		"query",
+		"markdown",
+		"css",
+		"html",
+		"javascript",
+		"latex",
+		"scss",
+		"svelte",
+		"tsx",
+		"typst",
+		"vue",
+		"regex",
+	},
+	callback = function()
+		vim.treesitter.start()
+	end,
+})
 
-	-- Se carregou, liga as cores (highlight) e a indentação inteligente do treesitter.
-	configs.setup({
-		ensure_installed = { "c", "lua", "vim", "vimdoc", "query", "markdown" },
-		highlight = { enable = true },
-		indent = { enable = true },
-	})
-end)
+-- Indentação (experimental)
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = {
+		"c",
+		"lua",
+		"vim",
+		"vimdoc",
+		"query",
+		"markdown",
+		"css",
+		"html",
+		"javascript",
+		"latex",
+		"scss",
+		"svelte",
+		"tsx",
+		"typst",
+		"vue",
+		"regex",
+	},
+	callback = function()
+		vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+	end,
+})

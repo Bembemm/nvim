@@ -25,64 +25,54 @@ end
 -- Garante que o path está no runtimepath (para quando já está instalado)
 vim.opt.runtimepath:append(harpoon_path)
 
-vim.schedule(function()
-	-- plenary é dependência do harpoon2
-	vim.pack.add({ "https://github.com/nvim-lua/plenary.nvim" })
+vim.pack.add({ "https://github.com/nvim-lua/plenary.nvim" })
 
-	local ok, harpoon = pcall(require, "harpoon")
-	if not ok then
-		vim.notify(
-			"Harpoon2: não carregou. Delete ~/.local/share/nvim/site/pack/core/opt/harpoon e reinicie.",
-			vim.log.levels.WARN
-		)
-		return
-	end
+local harpoon = require("harpoon")
 
-	harpoon:setup({
-		settings = {
-			save_on_toggle = true,
-			sync_on_ui_close = true,
-		},
-	})
+harpoon:setup({
+	settings = {
+		save_on_toggle = true,
+		sync_on_ui_close = true,
+	},
+})
 
-	-- Extend: abre em split vertical/horizontal e tab direto do menu
-	harpoon:extend({
-		UI_CREATE = function(cx)
-			vim.keymap.set("n", "<C-v>", function()
-				harpoon.ui:select_menu_item({ vsplit = true })
-			end, { buffer = cx.bufnr })
-			vim.keymap.set("n", "<C-x>", function()
-				harpoon.ui:select_menu_item({ split = true })
-			end, { buffer = cx.bufnr })
-		end,
-	})
+-- Extend: abre em split vertical/horizontal e tab direto do menu
+harpoon:extend({
+	UI_CREATE = function(cx)
+		vim.keymap.set("n", "<C-v>", function()
+			harpoon.ui:select_menu_item({ vsplit = true })
+		end, { buffer = cx.bufnr })
+		vim.keymap.set("n", "<C-x>", function()
+			harpoon.ui:select_menu_item({ split = true })
+		end, { buffer = cx.bufnr })
+	end,
+})
 
-	local list = function()
-		return harpoon:list()
-	end
+local list = function()
+	return harpoon:list()
+end
 
-	-- Adicionar arquivo atual à lista
-	vim.keymap.set("n", "<leader>a", function()
-		list():add()
-	end, { desc = "Harpoon: Adicionar arquivo" })
+-- Adicionar arquivo atual à lista
+vim.keymap.set("n", "<leader>a", function()
+	list():add()
+end, { desc = "Harpoon: Adicionar arquivo" })
 
-	-- Abrir o menu rápido
-	vim.keymap.set("n", "<C-e>", function()
-		harpoon.ui:toggle_quick_menu(list())
-	end, { desc = "Harpoon: Menu rápido" })
+-- Abrir o menu rápido
+vim.keymap.set("n", "<C-e>", function()
+	harpoon.ui:toggle_quick_menu(list())
+end, { desc = "Harpoon: Menu rápido" })
 
-	-- Navegar direto para os arquivos 1-4
-	for i = 1, 4 do
-		vim.keymap.set("n", "<C-" .. i .. ">", function()
-			list():select(i)
-		end, { desc = "Harpoon: Ir para arquivo " .. i })
-	end
+-- Navegar direto para os arquivos 1-4
+for i = 1, 4 do
+	vim.keymap.set("n", "<C-" .. i .. ">", function()
+		list():select(i)
+	end, { desc = "Harpoon: Ir para arquivo " .. i })
+end
 
-	-- Navegar para próximo/anterior da lista
-	vim.keymap.set("n", "<leader>hn", function()
-		list():next()
-	end, { desc = "Harpoon: Próximo" })
-	vim.keymap.set("n", "<leader>hp", function()
-		list():prev()
-	end, { desc = "Harpoon: Anterior" })
-end)
+-- Navegar para próximo/anterior da lista
+vim.keymap.set("n", "<leader>hn", function()
+	list():next()
+end, { desc = "Harpoon: Próximo" })
+vim.keymap.set("n", "<leader>hp", function()
+	list():prev()
+end, { desc = "Harpoon: Anterior" })
