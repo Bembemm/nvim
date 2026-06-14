@@ -1,7 +1,8 @@
 vim.pack.add({
-	"https://github.com/sainnhe/gruvbox-material",
+	"https://github.com/nyoom-engineering/oxocarbon.nvim",
 })
-vim.g.gruvbox_material_background = "hard"
-vim.g.gruvbox_material_enable_italic = 1
-vim.g.gruvbox_material_better_performance = 1
-vim.cmd("colorscheme gruvbox-material")
+
+-- O Oxocarbon é um tema Dark, então voltamos para o background dark
+vim.o.background = "dark"
+
+vim.cmd("colorscheme oxocarbon")
