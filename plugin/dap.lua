@@ -19,7 +19,7 @@ local lldb_dap_cmd = executable.find({
     title = "DAP C++",
 })
 
-if lldb_dap_cmd then
+if vim.fn.exepath(lldb_dap_cmd) ~= "" then
     dap.adapters.lldb = {
         type = "executable",
         command = lldb_dap_cmd,
