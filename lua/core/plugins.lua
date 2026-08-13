@@ -1,0 +1,27 @@
+vim.pack.add({
+    "https://github.com/saghen/blink.lib",
+    "https://github.com/saghen/blink.cmp",
+    "https://github.com/stevearc/conform.nvim",
+    "https://github.com/mfussenegger/nvim-dap",
+    {
+        src = "https://github.com/igorlfs/nvim-dap-view",
+        version = vim.version.range("1.*"),
+    },
+    "https://github.com/nvim-tree/nvim-web-devicons",
+    "https://github.com/lewis6991/gitsigns.nvim",
+    "https://github.com/nvim-lua/plenary.nvim",
+    {
+        src = "https://github.com/ThePrimeagen/harpoon",
+        version = "harpoon2",
+    },
+    "https://github.com/lukas-reineke/indent-blankline.nvim",
+    "https://github.com/nvim-lualine/lualine.nvim",
+    "https://github.com/echasnovski/mini.nvim",
+    "https://github.com/stevearc/oil.nvim",
+    "https://github.com/folke/snacks.nvim",
+    "https://github.com/kylechui/nvim-surround",
+    "https://github.com/folke/todo-comments.nvim",
+    "https://github.com/nvim-treesitter/nvim-treesitter",
+    "https://github.com/folke/which-key.nvim",
+    "https://github.com/njorquera98/monokai_remastered.nvim",
+})
