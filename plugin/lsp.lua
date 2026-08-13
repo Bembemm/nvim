@@ -1,26 +1,6 @@
-local executable = require("core.executable")
-
-local lua_ls_cmd = executable.find({
-    names = "lua-language-server",
-    env = "LUA_LS_PATH",
-    notify = "lua-language-server não encontrado. Instale-o ou defina LUA_LS_PATH.",
-    title = "LSP Lua",
-})
-
-local clangd_cmd = executable.find({
-    names = "clangd",
-    env = "CLANGD_PATH",
-    extra_paths = {
-        "/opt/homebrew/opt/llvm/bin/clangd",
-        "/usr/local/opt/llvm/bin/clangd",
-    },
-    notify = "clangd não encontrado. Instale LLVM/clangd ou defina CLANGD_PATH.",
-    title = "LSP C++",
-})
-
-if executable.available(lua_ls_cmd) then
+if vim.fn.executable("lua-language-server") == 1 then
     vim.lsp.config("lua_ls", {
-        cmd = { lua_ls_cmd },
+        cmd = { "lua-language-server" },
         filetypes = { "lua" },
         root_markers = { ".luarc.json", ".luarc.jsonc", ".git" },
         settings = {
@@ -39,10 +19,10 @@ if executable.available(lua_ls_cmd) then
     vim.lsp.enable("lua_ls")
 end
 
-if executable.available(clangd_cmd) then
+if vim.fn.executable("clangd") == 1 then
     vim.lsp.config("clangd", {
         cmd = {
-            clangd_cmd,
+            "clangd",
             "--background-index",
             "--clang-tidy",
             "--completion-style=detailed",
