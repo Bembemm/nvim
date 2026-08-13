@@ -84,6 +84,10 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 |---|---|
 | **Neovim 0.12+** | APIs modernas da configuração |
 | **Git** | instalação e atualização de plugins |
+| **curl** | download de parsers do Treesitter |
+| **tar** | extração dos parsers do Treesitter |
+| **tree-sitter-cli >= 0.26.1** | geração e compilação dos parsers |
+| **Rust toolchain (`cargo` + `rustc`)** | compilação do fuzzy matcher do Blink v2 a partir do source |
 | **lua-language-server** | LSP para Lua |
 | **StyLua** | formatação de Lua |
 | **clangd** | LSP para C++ |
@@ -500,6 +504,11 @@ Ferramentas externas esperadas:
 
 ```text
 git
+curl
+tar
+tree-sitter >= 0.26.1
+cargo
+rustc
 lua-language-server
 stylua
 clangd
