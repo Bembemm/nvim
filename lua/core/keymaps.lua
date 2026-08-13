@@ -13,15 +13,6 @@ keymap.set("n", "<leader>pu", function()
     vim.pack.update()
 end, { desc = "Atualizar plugins" })
 
--- Diagnósticos
-keymap.set("n", "]d", function()
-    vim.diagnostic.jump({ count = 1, float = true })
-end, { desc = "Próximo diagnóstico" })
-
-keymap.set("n", "[d", function()
-    vim.diagnostic.jump({ count = -1, float = true })
-end, { desc = "Diagnóstico anterior" })
-
 -- Buffers
 keymap.set("n", "<leader>bd", "<cmd>bdelete<CR>", { desc = "Fechar buffer" })
 keymap.set("n", "<leader>bo", function()
