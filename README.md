@@ -50,9 +50,9 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 ├── README.md
 ├── lua/
 │   └── core/
-│       ├── executable.lua
 │       ├── keymaps.lua
-│       └── options.lua
+│       ├── options.lua
+│       └── plugins.lua
 │
 └── plugin/
     ├── blink.lua
@@ -74,7 +74,7 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
     └── which-key.lua
 ```
 
-`init.lua` permanece pequeno de propósito. Os arquivos em `plugin/` são carregados pelo runtime do Neovim e `lua/core/executable.lua` centraliza a descoberta de ferramentas externas.
+`init.lua` permanece pequeno de propósito. A declaração dos plugins fica centralizada em `lua/core/plugins.lua`, enquanto os arquivos em `plugin/` cuidam apenas da configuração de cada plugin.
 
 ---
 
@@ -97,38 +97,13 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 | **ripgrep (`rg`)** | grep e busca de TODOs |
 | **Nerd Font** | ícones da interface |
 
+As ferramentas externas devem estar disponíveis no `PATH`.
+
 A GUI usa, quando disponível:
 
 ```text
 Iosevka Nerd Font 14
 ```
-
----
-
-## Resolução portátil de executáveis
-
-Ferramentas externas não ficam presas a uma distribuição específica. `lua/core/executable.lua` procura executáveis nesta ordem geral:
-
-1. variável de ambiente de override;
-2. `PATH`;
-3. `$PREFIX/bin` e `$TERMUX_PREFIX/bin` para Termux;
-4. `~/.local/bin`;
-5. `~/.nix-profile/bin` e `/run/current-system/sw/bin` para Nix/NixOS;
-6. `/usr/local/bin` e `/usr/bin`;
-7. `/opt/homebrew/bin`;
-8. caminhos extras específicos da ferramenta, quando necessários.
-
-Overrides disponíveis:
-
-```bash
-export LUA_LS_PATH="/caminho/lua-language-server"
-export STYLUA_PATH="/caminho/stylua"
-export CLANGD_PATH="/caminho/clangd"
-export CLANG_FORMAT_PATH="/caminho/clang-format"
-export LLDB_DAP_PATH="/caminho/lldb-dap"
-```
-
-Assim a mesma configuração pode ser usada em Arch, Fedora, NixOS, Termux e outros ambientes sem blocos `if distro == ...`.
 
 ---
 
@@ -371,7 +346,7 @@ C++ → clang-format
 
 O Conform executa `clang-format` ao salvar arquivos `cpp`. O nome do arquivo é repassado ao formatter, portanto um `.clang-format` existente no projeto é respeitado.
 
-Se o executável externo não estiver disponível, `lsp_format = "fallback"` permite usar a capacidade de formatação do LSP quando disponível.
+Se o formatter externo não estiver disponível, `lsp_format = "fallback"` permite usar a capacidade de formatação do LSP quando disponível.
 
 Para inspecionar o formatter ativo:
 
@@ -478,7 +453,7 @@ O colorscheme é **Monokai Remastered** com `termguicolors`, background escuro e
 
 ## Plugins
 
-Todos os plugins são declarados com `vim.pack.add()`.
+Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`.
 
 Para atualizar:
 
@@ -525,9 +500,6 @@ Verificações úteis:
 :checkhealth vim.lsp
 :checkhealth which-key
 :ConformInfo
-:echo exepath('clangd')
-:echo exepath('clang-format')
-:echo exepath('lldb-dap')
 ```
 
 ---
