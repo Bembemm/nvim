@@ -93,12 +93,21 @@ local function switch_source_header(client, bufnr)
     end, bufnr)
 end
 
+local notified_clients = {}
+
 vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(ev)
         local buf = ev.buf
         local client = vim.lsp.get_client_by_id(ev.data.client_id)
         local opts = function(desc)
             return { buffer = buf, desc = desc }
+        end
+
+        if client and not notified_clients[client.id] then
+            notified_clients[client.id] = true
+            vim.schedule(function()
+                vim.notify(("LSP carregado: %s"):format(client.name), vim.log.levels.INFO, { title = "LSP" })
+            end)
         end
 
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts("Ir para definição"))
