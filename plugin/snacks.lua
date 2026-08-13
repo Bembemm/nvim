@@ -108,6 +108,20 @@ local function restore_session()
     end
 end
 
+local function git_branch()
+    local root = snacks.git.get_root()
+    if not root then
+        return ""
+    end
+
+    local ok, lines = pcall(vim.fn.readfile, root .. "/.git/HEAD")
+    if not ok or not lines[1] then
+        return ""
+    end
+
+    return lines[1]:match("^ref: refs/heads/(.+)$") or lines[1]:sub(1, 7)
+end
+
 snacks.setup({
     dashboard = {
         enabled = true,
@@ -185,7 +199,7 @@ snacks.setup({
             {
                 pane = 2,
                 icon = " ",
-                title = "GIT STATUS",
+                title = "GIT STATUS [" .. git_branch() .. "]",
                 section = "terminal",
                 enabled = function()
                     return snacks.git.get_root() ~= nil
@@ -221,6 +235,10 @@ snacks.setup({
         doc = { enabled = true, inline = true, float = true },
     },
 })
+
+vim.keymap.set("n", "<leader>.d", function()
+    snacks.dashboard.open()
+end, { desc = "Dashboard" })
 
 vim.keymap.set("n", "<leader>ff", function()
     snacks.picker.files()
