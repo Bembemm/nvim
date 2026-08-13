@@ -1,7 +1,3 @@
-vim.pack.add({
-    "https://github.com/njorquera98/monokai_remastered.nvim",
-})
-
 local monokai = require("monokai")
 local palette = vim.deepcopy(monokai.classic)
 

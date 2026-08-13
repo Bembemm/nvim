@@ -1,5 +1,3 @@
-vim.pack.add({ "https://github.com/stevearc/oil.nvim" })
-
 local oil = require("oil")
 
 -- Configura o Oil para ser o explorador padrão e mostrar arquivos ocultos (.config, .env)

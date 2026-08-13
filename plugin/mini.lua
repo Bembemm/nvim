@@ -1,5 +1,3 @@
-vim.pack.add({ "https://github.com/echasnovski/mini.nvim" })
-
 local pairs = require("mini.pairs")
 
 pairs.setup({

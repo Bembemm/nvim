@@ -1,8 +1,3 @@
-vim.pack.add({
-	"https://github.com/saghen/blink.lib",
-	"https://github.com/saghen/blink.cmp",
-})
-
 local blink = require("blink.cmp")
 
 blink.build():pwait()

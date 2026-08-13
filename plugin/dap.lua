@@ -1,11 +1,3 @@
-vim.pack.add({
-    "https://github.com/mfussenegger/nvim-dap",
-    {
-        src = "https://github.com/igorlfs/nvim-dap-view",
-        version = vim.version.range("1.*"),
-    },
-})
-
 local dap = require("dap")
 local dap_view = require("dap-view")
 local executable = require("core.executable")

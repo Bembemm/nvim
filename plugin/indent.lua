@@ -1,9 +1,5 @@
 -- ~/.config/nvim/plugin/04-indent.lua
 
-vim.pack.add({
-	"https://github.com/lukas-reineke/indent-blankline.nvim",
-})
-
 local ibl = require("ibl")
 
 -- Lista com a ordem das cores que vão se repetir
