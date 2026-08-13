@@ -5,13 +5,19 @@ vim.loader.enable()
 require("core.options")
 require("core.keymaps")
 
--- 3. Hook obrigatório para o Treesitter compilar sozinho na primeira instalação
-vim.api.nvim_create_autocmd('PackChanged', {
-  callback = function(ev)
-    local name, kind = ev.data.spec.name, ev.data.kind
-    if name == 'nvim-treesitter' and kind == 'update' then
-      if not ev.data.active then vim.cmd.packadd('nvim-treesitter') end
-      vim.cmd('TSUpdate')
-    end
-  end
+-- 3. Mantém os parsers do nvim-treesitter sincronizados após instalação ou atualização
+vim.api.nvim_create_autocmd("PackChanged", {
+    callback = function(ev)
+        local name, kind = ev.data.spec.name, ev.data.kind
+
+        if name ~= "nvim-treesitter" or (kind ~= "install" and kind ~= "update") then
+            return
+        end
+
+        if kind == "install" or not ev.data.active then
+            vim.cmd.packadd("nvim-treesitter")
+        end
+
+        vim.cmd("TSUpdate")
+    end,
 })
