@@ -1,8 +1,13 @@
 vim.pack.add({
-	"https://github.com/nyoom-engineering/oxocarbon.nvim",
+    "https://github.com/njorquera98/monokai_remastered.nvim",
 })
 
--- O Oxocarbon é um tema Dark, então voltamos para o background dark
-vim.o.background = "dark"
+local monokai = require("monokai")
+local palette = vim.deepcopy(monokai.classic)
 
-vim.cmd("colorscheme oxocarbon")
+palette.brown = "#625E4C"
+
+monokai.setup({
+    palette = palette,
+    italics = true,
+})

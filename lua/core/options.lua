@@ -1,7 +1,7 @@
 local opt = vim.opt
 
 -- Fonte (Neovide/GUI)
-vim.opt.guifont = "Iosevka Nerd Font:h14"
+opt.guifont = "Iosevka Nerd Font:h14"
 
 -- Números de linha
 opt.number = true
@@ -19,23 +19,24 @@ opt.smartindent = true
 opt.wrap = false
 opt.termguicolors = true
 opt.cursorline = true
-opt.signcolumn = "yes" -- evita o texto "pular" quando sinais aparecem
+opt.signcolumn = "yes"
 opt.numberwidth = 2
-opt.winborder = "rounded" -- bordas arredondadas em todas as floats (0.11+)
-opt.scrolloff = 8 -- mantém 8 linhas acima/abaixo do cursor
+opt.winborder = "rounded"
+opt.scrolloff = 8
 
 -- Busca
 opt.hlsearch = false
 opt.ignorecase = true
 opt.smartcase = true
-opt.inccommand = "nosplit" -- preview ao vivo de :s/old/new
+opt.inccommand = "nosplit"
 
 -- Arquivos
 opt.swapfile = false
-opt.undofile = true -- persiste o histórico de undo entre sessões
+opt.undofile = true
 
--- Performance
-opt.updatetime = 50 -- reduz latência do LSP e gitsigns
+-- Responsividade
+opt.updatetime = 200
+opt.timeoutlen = 500
 
 -- Clipboard
 opt.clipboard = "unnamedplus"
@@ -43,9 +44,6 @@ opt.clipboard = "unnamedplus"
 -- Completion
 opt.completeopt = "menu,menuone,noselect"
 
--- Caracteres invisíveis (útil para debug de formatação)
+-- Caracteres invisíveis
 opt.listchars = "tab:→ ,trail:·,eol:↵"
 opt.list = true
-
--- Tempo limite para sequências de teclas
-opt.timeoutlen = 1000
