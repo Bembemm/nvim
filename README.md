@@ -223,8 +223,8 @@ Dentro do menu:
 | `gd` | Definição |
 | `gD` | Declaração |
 | `K` | Hover / documentação |
-| `gi` | Implementação |
-| `gr` | Referências |
+| `gri` | Implementação (nativo do Neovim) |
+| `grr` | Referências (nativo do Neovim) |
 | `]d` | Próximo diagnóstico |
 | `[d` | Diagnóstico anterior |
 
