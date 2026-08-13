@@ -21,3 +21,6 @@ vim.api.nvim_create_autocmd("PackChanged", {
         vim.cmd("TSUpdate")
     end,
 })
+
+-- 4. Declara os plugins durante o init.lua para evitar carregamento recursivo no bootstrap
+require("core.plugins")
