@@ -2,7 +2,11 @@ local snacks = require("snacks")
 
 snacks.setup({
     picker = { enabled = true },
-    notifier = { enabled = true },
+    notifier = {
+        enabled = true,
+        timeout = 2500,
+        style = "fancy",
+    },
     image = {
         enabled = true,
         force = true,
