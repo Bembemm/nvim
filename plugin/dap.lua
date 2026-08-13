@@ -1,6 +1,5 @@
 local dap = require("dap")
 local dap_view = require("dap-view")
-local executable = require("core.executable")
 
 dap_view.setup({
     auto_toggle = true,
@@ -8,18 +7,12 @@ dap_view.setup({
     virtual_text = { enabled = true, position = "inline" },
 })
 
-local lldb_dap_cmd = executable.find({
-    names = { "lldb-dap", "lldb-vscode" },
-    env = "LLDB_DAP_PATH",
-    extra_paths = {
-        "/opt/homebrew/opt/llvm/bin/lldb-dap",
-        "/usr/local/opt/llvm/bin/lldb-dap",
-    },
-    notify = "lldb-dap não encontrado. Instale LLDB ou defina LLDB_DAP_PATH.",
-    title = "DAP C++",
-})
+local lldb_dap_cmd = vim.fn.exepath("lldb-dap")
+if lldb_dap_cmd == "" then
+    lldb_dap_cmd = vim.fn.exepath("lldb-vscode")
+end
 
-if vim.fn.exepath(lldb_dap_cmd) ~= "" then
+if lldb_dap_cmd ~= "" then
     dap.adapters.lldb = {
         type = "executable",
         command = lldb_dap_cmd,
