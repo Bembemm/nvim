@@ -94,8 +94,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts("Ir para definição"))
         vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts("Ir para declaração"))
         vim.keymap.set("n", "K", vim.lsp.buf.hover, opts("Documentação"))
-        vim.keymap.set("n", "gi", vim.lsp.buf.implementation, opts("Ir para implementação"))
-        vim.keymap.set("n", "gr", vim.lsp.buf.references, opts("Referências"))
         vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, opts("Code action"))
         vim.keymap.set("n", "<leader>ld", vim.diagnostic.open_float, opts("Diagnóstico da linha"))
         vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, opts("Renomear símbolo"))
