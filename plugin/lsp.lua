@@ -94,6 +94,10 @@ local function switch_source_header(client, bufnr)
 end
 
 local notified_clients = {}
+local lsp_names = {
+    clangd = "C/C++ · clangd",
+    lua_ls = "Lua · LuaLS",
+}
 
 vim.api.nvim_create_autocmd("LspAttach", {
     callback = function(ev)
@@ -105,8 +109,12 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
         if client and not notified_clients[client.id] then
             notified_clients[client.id] = true
+            local name = lsp_names[client.name] or client.name
             vim.schedule(function()
-                vim.notify(("LSP carregado: %s"):format(client.name), vim.log.levels.INFO, { title = "LSP" })
+                vim.notify(("󰒋  %s carregado"):format(name), vim.log.levels.INFO, {
+                    title = "LSP Ready",
+                    icon = "󰒋 ",
+                })
             end)
         end
 
