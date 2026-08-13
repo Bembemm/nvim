@@ -111,7 +111,7 @@ end
 snacks.setup({
     dashboard = {
         enabled = true,
-        width = 60,
+        width = 56,
         pane_gap = 4,
         preset = {
             keys = {
