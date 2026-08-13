@@ -5,6 +5,8 @@ vim.pack.add({
 
 local blink = require("blink.cmp")
 
+blink.build():pwait()
+
 blink.setup({
 	keymap = { preset = "default" },
 
