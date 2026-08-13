@@ -1,18 +1,12 @@
 vim.pack.add({ "https://github.com/nvim-treesitter/nvim-treesitter" })
 
-require("nvim-treesitter").setup({
+local treesitter = require("nvim-treesitter")
+
+treesitter.setup({
     install_dir = vim.fn.stdpath("data") .. "/site",
 })
 
-require("nvim-treesitter").install({
-    "lua",
-    "cpp",
-    "vim",
-    "vimdoc",
-    "query",
-})
-
-local ts_filetypes = {
+local parsers = {
     "lua",
     "cpp",
     "vim",
@@ -20,8 +14,10 @@ local ts_filetypes = {
     "query",
 }
 
+treesitter.install(parsers):wait(300000)
+
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = ts_filetypes,
+    pattern = parsers,
     callback = function()
         vim.treesitter.start()
         vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
