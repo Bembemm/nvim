@@ -6,6 +6,7 @@ treesitter.setup({
 
 local parsers = {
     "lua",
+    "c",
     "cpp",
     "vim",
     "vimdoc",

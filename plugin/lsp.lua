@@ -1,3 +1,9 @@
+local function notify_missing(message)
+    vim.schedule(function()
+        vim.notify_once(message, vim.log.levels.WARN, { title = "Dependência ausente" })
+    end)
+end
+
 if vim.fn.executable("lua-language-server") == 1 then
     vim.lsp.config("lua_ls", {
         cmd = { "lua-language-server" },
@@ -17,6 +23,8 @@ if vim.fn.executable("lua-language-server") == 1 then
     })
 
     vim.lsp.enable("lua_ls")
+else
+    notify_missing("lua-language-server não encontrado; o LSP para Lua foi desativado.")
 end
 
 if vim.fn.executable("clangd") == 1 then
@@ -27,7 +35,7 @@ if vim.fn.executable("clangd") == 1 then
             "--clang-tidy",
             "--completion-style=detailed",
         },
-        filetypes = { "cpp" },
+        filetypes = { "c", "cpp" },
         root_markers = {
             ".clangd",
             "compile_commands.json",
@@ -39,6 +47,8 @@ if vim.fn.executable("clangd") == 1 then
     })
 
     vim.lsp.enable("clangd")
+else
+    notify_missing("clangd não encontrado; o LSP para C/C++ foi desativado.")
 end
 
 vim.diagnostic.config({

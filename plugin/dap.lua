@@ -39,6 +39,14 @@ if lldb_dap_cmd ~= "" then
             cwd = "${workspaceFolder}",
         },
     }
+else
+    vim.schedule(function()
+        vim.notify_once(
+            "lldb-dap/lldb-vscode não encontrado; o debug C++ foi desativado.",
+            vim.log.levels.WARN,
+            { title = "Dependência ausente" }
+        )
+    end)
 end
 
 vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DiagnosticError" })

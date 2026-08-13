@@ -1,0 +1,38 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check formatting
+        uses: JohnnyMorganz/stylua-action@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: 2.5.2
+          args: --check .
+
+      - name: Install Neovim 0.12
+        run: |
+          curl --fail --location --retry 3 \
+            https://github.com/neovim/neovim/releases/download/v0.12.0/nvim-linux-x86_64.tar.gz \
+            --output /tmp/nvim.tar.gz
+          tar --extract --gzip --no-same-owner --file /tmp/nvim.tar.gz --directory /tmp
+          echo "/tmp/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+
+      - name: Check Lua syntax with Neovim
+        run: |
+          NVIM_LOG_FILE=/tmp/nvim.log nvim --headless --clean -u NONE \
+            -c "lua for path, kind in vim.fs.dir('.', { depth = math.huge }) do if kind == 'file' and path:match('%.lua$') then local chunk, err = loadfile(path); assert(chunk, err) end end" \
+            -c "quit"

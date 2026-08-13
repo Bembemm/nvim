@@ -3,6 +3,7 @@ local conform = require("conform")
 conform.setup({
     formatters_by_ft = {
         lua = { "stylua" },
+        c = { "clang-format" },
         cpp = { "clang-format" },
     },
     default_format_opts = {

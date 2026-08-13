@@ -12,6 +12,7 @@ Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · LLDB · Monoka
 ![Plugins](https://img.shields.io/badge/plugins-vim.pack-6E56CF)
 ![Debug](https://img.shields.io/badge/debug-LLDB-6E56CF)
 ![Theme](https://img.shields.io/badge/theme-Monokai%20Remastered-F4005F)
+[![CI](https://github.com/Bembemm/nvim/actions/workflows/ci.yml/badge.svg)](https://github.com/Bembemm/nvim/actions/workflows/ci.yml)
 
 </div>
 
@@ -97,7 +98,9 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 | **ripgrep (`rg`)** | grep e busca de TODOs |
 | **Nerd Font** | ícones da interface |
 
-As ferramentas externas devem estar disponíveis no `PATH`.
+As ferramentas externas devem estar disponíveis no `PATH`. Quando `lua-language-server`, `clangd` ou
+`lldb-dap`/`lldb-vscode` não são encontrados, a configuração continua iniciando e mostra uma notificação com o
+recurso que foi desativado.
 
 A GUI usa, quando disponível:
 
@@ -281,12 +284,15 @@ lldb-dap      → debugging
 O servidor é configurado diretamente pela API nativa do Neovim:
 
 ```text
-filetype: cpp
+filetypes: c, cpp
 flags:
   --background-index
   --clang-tidy
   --completion-style=detailed
 ```
+
+O filetype `c` também é aceito porque headers `.h` são detectados dessa forma pelo Neovim. Assim, esses headers
+continuam com clangd mesmo quando fazem parte de um projeto C++.
 
 Não são forçados `-std=c++17`, `-std=c++20`, includes ou defines globais. Essas opções pertencem ao projeto e devem vir da compilação real.
 
@@ -329,22 +335,25 @@ Parsers instalados:
 
 ```text
 lua
+c
 cpp
 vim
 vimdoc
 query
 ```
 
-Somente `cpp` foi adicionado; não foi habilitado suporte separado para C.
+Os parsers `c` e `cpp` são instalados para que headers `.h`, normalmente detectados como `c`, também tenham
+highlight e indentação via Treesitter.
 
 ### Formatação
 
 ```text
-Lua → StyLua
-C++ → clang-format
+Lua     → StyLua
+C / C++ → clang-format
 ```
 
-O Conform executa `clang-format` ao salvar arquivos `cpp`. O nome do arquivo é repassado ao formatter, portanto um `.clang-format` existente no projeto é respeitado.
+O Conform executa `clang-format` ao salvar arquivos `c` ou `cpp`. O nome do arquivo é repassado ao formatter,
+portanto um `.clang-format` existente no projeto é respeitado.
 
 Se o formatter externo não estiver disponível, `lsp_format = "fallback"` permite usar a capacidade de formatação do LSP quando disponível.
 

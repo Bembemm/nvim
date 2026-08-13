@@ -2,8 +2,8 @@ local oil = require("oil")
 
 -- Configura o Oil para ser o explorador padrão e mostrar arquivos ocultos (.config, .env)
 oil.setup({
-	default_file_explorer = true,
-	view_options = { show_hidden = true },
+    default_file_explorer = true,
+    view_options = { show_hidden = true },
 })
 
 -- Atalho: Aperte Espaço + o (letra O) para abrir as pastas
