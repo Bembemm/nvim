@@ -8,43 +8,45 @@ dap_view.setup({
     virtual_text = { enabled = true, position = "inline" },
 })
 
-local function resolve_lldb_dap()
-    return executable.find({
-        names = { "lldb-dap", "lldb-vscode" },
-        env = "LLDB_DAP_PATH",
-        extra_paths = {
-            "/opt/homebrew/opt/llvm/bin/lldb-dap",
-            "/usr/local/opt/llvm/bin/lldb-dap",
+local lldb_dap_cmd = executable.find({
+    names = { "lldb-dap", "lldb-vscode" },
+    env = "LLDB_DAP_PATH",
+    extra_paths = {
+        "/opt/homebrew/opt/llvm/bin/lldb-dap",
+        "/usr/local/opt/llvm/bin/lldb-dap",
+    },
+    notify = "lldb-dap não encontrado. Instale LLDB ou defina LLDB_DAP_PATH.",
+    title = "DAP C++",
+})
+
+if lldb_dap_cmd then
+    dap.adapters.lldb = {
+        type = "executable",
+        command = lldb_dap_cmd,
+        name = "lldb",
+    }
+
+    dap.configurations.cpp = {
+        {
+            name = "Executar programa C++",
+            type = "lldb",
+            request = "launch",
+            program = function()
+                return vim.fn.input("Executável: ", vim.fn.getcwd() .. "/", "file")
+            end,
+            cwd = "${workspaceFolder}",
+            stopOnEntry = false,
+            runInTerminal = true,
         },
-        notify = "lldb-dap não encontrado. Instale LLDB ou defina LLDB_DAP_PATH.",
-        title = "DAP C++",
-    })
+        {
+            name = "Anexar a processo C++",
+            type = "lldb",
+            request = "attach",
+            pid = require("dap.utils").pick_process,
+            cwd = "${workspaceFolder}",
+        },
+    }
 end
-
-dap.adapters.lldb = function(callback)
-    callback({ type = "executable", command = resolve_lldb_dap(), name = "lldb" })
-end
-
-dap.configurations.cpp = {
-    {
-        name = "Executar programa C++",
-        type = "lldb",
-        request = "launch",
-        program = function()
-            return vim.fn.input("Executável: ", vim.fn.getcwd() .. "/", "file")
-        end,
-        cwd = "${workspaceFolder}",
-        stopOnEntry = false,
-        runInTerminal = true,
-    },
-    {
-        name = "Anexar a processo C++",
-        type = "lldb",
-        request = "attach",
-        pid = require("dap.utils").pick_process,
-        cwd = "${workspaceFolder}",
-    },
-}
 
 vim.fn.sign_define("DapBreakpoint", { text = "", texthl = "DiagnosticError" })
 vim.fn.sign_define("DapBreakpointCondition", { text = "", texthl = "DiagnosticWarn" })
