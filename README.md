@@ -48,8 +48,6 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 ├── .stylua.toml
 ├── init.lua
 ├── README.md
-├── nvim-pack-lock.json
-│
 ├── lua/
 │   └── core/
 │       ├── executable.lua
@@ -474,7 +472,7 @@ O colorscheme é **Monokai Remastered** com `termguicolors`, background escuro e
 
 ---
 
-## Plugins e lockfile
+## Plugins
 
 Todos os plugins são declarados com `vim.pack.add()`.
 
@@ -489,8 +487,6 @@ ou:
 ```text
 <leader>pu
 ```
-
-O `nvim-pack-lock.json` deve ser mantido pelo próprio `vim.pack`; evite editar revisões manualmente.
 
 ---
 
