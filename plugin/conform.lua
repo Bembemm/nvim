@@ -9,7 +9,7 @@ local stylua_cmd = executable.find({
     env = "STYLUA_PATH",
 })
 
-if stylua_cmd then
+if executable.available(stylua_cmd) then
     formatters.stylua = { command = stylua_cmd }
 end
 
@@ -22,7 +22,7 @@ local clang_format_cmd = executable.find({
     },
 })
 
-if clang_format_cmd then
+if executable.available(clang_format_cmd) then
     formatters["clang-format"] = { command = clang_format_cmd }
 end
 
