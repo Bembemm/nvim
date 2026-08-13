@@ -6,6 +6,12 @@ local function add(candidates, path)
     end
 end
 
+---@param path string?
+---@return boolean
+function M.available(path)
+    return path ~= nil and path ~= "" and vim.fn.executable(path) == 1
+end
+
 ---@param opts { names: string|string[], env?: string, extra_paths?: string[], notify?: string, title?: string }
 ---@return string
 function M.find(opts)
