@@ -18,43 +18,48 @@ local clangd_cmd = executable.find({
     title = "LSP C++",
 })
 
-vim.lsp.config("lua_ls", {
-    cmd = { lua_ls_cmd },
-    filetypes = { "lua" },
-    root_markers = { ".luarc.json", ".luarc.jsonc", ".git" },
-    settings = {
-        Lua = {
-            runtime = { version = "LuaJIT" },
-            diagnostics = { globals = { "vim" } },
-            workspace = {
-                library = vim.api.nvim_get_runtime_file("", true),
-                checkThirdParty = false,
+if lua_ls_cmd then
+    vim.lsp.config("lua_ls", {
+        cmd = { lua_ls_cmd },
+        filetypes = { "lua" },
+        root_markers = { ".luarc.json", ".luarc.jsonc", ".git" },
+        settings = {
+            Lua = {
+                runtime = { version = "LuaJIT" },
+                diagnostics = { globals = { "vim" } },
+                workspace = {
+                    library = vim.api.nvim_get_runtime_file("", true),
+                    checkThirdParty = false,
+                },
+                format = { enable = false },
             },
-            format = { enable = false },
         },
-    },
-})
+    })
 
-vim.lsp.config("clangd", {
-    cmd = {
-        clangd_cmd,
-        "--background-index",
-        "--clang-tidy",
-        "--completion-style=detailed",
-    },
-    filetypes = { "cpp" },
-    root_markers = {
-        ".clangd",
-        "compile_commands.json",
-        "compile_flags.txt",
-        "CMakeLists.txt",
-        "meson.build",
-        ".git",
-    },
-})
+    vim.lsp.enable("lua_ls")
+end
 
-vim.lsp.enable("lua_ls")
-vim.lsp.enable("clangd")
+if clangd_cmd then
+    vim.lsp.config("clangd", {
+        cmd = {
+            clangd_cmd,
+            "--background-index",
+            "--clang-tidy",
+            "--completion-style=detailed",
+        },
+        filetypes = { "cpp" },
+        root_markers = {
+            ".clangd",
+            "compile_commands.json",
+            "compile_flags.txt",
+            "CMakeLists.txt",
+            "meson.build",
+            ".git",
+        },
+    })
+
+    vim.lsp.enable("clangd")
+end
 
 vim.diagnostic.config({
     virtual_text = {
