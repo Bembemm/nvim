@@ -34,5 +34,5 @@ jobs:
       - name: Check Lua syntax with Neovim
         run: |
           NVIM_LOG_FILE=/tmp/nvim.log nvim --headless --clean -u NONE \
-            -c "lua for path, kind in vim.fs.dir('.', { depth = math.huge }) do if kind == 'file' and path:match('%.lua$') then local chunk, err = loadfile(path); assert(chunk, err) end end" \
+            -c "lua local failed = false; for path, kind in vim.fs.dir('.', { depth = math.huge }) do if kind == 'file' and path:match('%.lua$') then local chunk, err = loadfile(path); if not chunk then vim.api.nvim_err_writeln(err); failed = true end end end; if failed then vim.cmd('cquit 1') end" \
             -c "quit"

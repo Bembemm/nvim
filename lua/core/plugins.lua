@@ -19,6 +19,7 @@ vim.pack.add({
     "https://github.com/echasnovski/mini.nvim",
     "https://github.com/stevearc/oil.nvim",
     "https://github.com/folke/snacks.nvim",
+    "https://github.com/sphamba/smear-cursor.nvim",
     "https://github.com/kylechui/nvim-surround",
     "https://github.com/folke/todo-comments.nvim",
     "https://github.com/nvim-treesitter/nvim-treesitter",

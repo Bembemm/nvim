@@ -38,6 +38,7 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 - explorer com **Oil**
 - navegação rápida com **Harpoon 2**
 - atalhos organizados com **Which-Key v3**
+- animação do cursor com **Smear Cursor**
 - tema **Monokai Remastered**
 
 ---
@@ -67,7 +68,9 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
     ├── lsp.lua
     ├── lualine.lua
     ├── mini.lua
+    ├── mode-line-numbers.lua
     ├── oil.lua
+    ├── smear-cursor.lua
     ├── snacks.lua
     ├── surround.lua
     ├── todo.lua
@@ -129,9 +132,12 @@ Iosevka Nerd Font 14
 | **lualine.nvim** | statusline |
 | **nvim-web-devicons** | ícones de arquivos |
 | **mini.nvim** | `mini.pairs` |
+| **smear-cursor.nvim** | animação do cursor entre posições, buffers e janelas |
 | **nvim-surround** | manipulação de delimitadores |
 | **monokai_remastered.nvim** | colorscheme |
 | **plenary.nvim** | dependência do Harpoon 2 |
+
+O Smear Cursor inicia ativo com a configuração padrão e pode ser alternado com `:SmearCursorToggle`.
 
 ---
 
@@ -438,7 +444,7 @@ A configuração global de diagnósticos usa:
 ## Opções importantes
 
 ```text
-line numbers        absolute + relative
+line numbers        absolute
 indent              4 espaços
 expandtab           ligado
 wrap                desligado
@@ -451,6 +457,18 @@ updatetime          200 ms
 timeoutlen           500 ms
 floating borders    rounded
 ```
+
+A numeração permanece absoluta (`1`, `2`, `3`...) em qualquer posição do cursor. A cor do gutter acompanha o
+modo atual usando a paleta Monokai:
+
+| Modo | Cor |
+|---|---|
+| Normal | aqua |
+| Insert | verde |
+| Visual / Select | roxo |
+| Replace | vermelho |
+| Command | laranja |
+| Terminal | amarelo |
 
 ---
 

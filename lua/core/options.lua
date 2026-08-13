@@ -5,7 +5,7 @@ opt.guifont = "Iosevka Nerd Font:h14"
 
 -- Números de linha
 opt.number = true
-opt.relativenumber = true
+opt.relativenumber = false
 
 -- Indentação
 opt.tabstop = 4
