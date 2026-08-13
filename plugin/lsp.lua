@@ -8,7 +8,7 @@ if vim.fn.executable("lua-language-server") == 1 then
                 runtime = { version = "LuaJIT" },
                 diagnostics = { globals = { "vim" } },
                 workspace = {
-                    library = vim.api.nvim_get_runtime_file("", true),
+                    library = { vim.env.VIMRUNTIME },
                     checkThirdParty = false,
                 },
                 format = { enable = false },
@@ -99,7 +99,7 @@ vim.api.nvim_create_autocmd("LspAttach", {
         vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, opts("Renomear símbolo"))
         vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, opts("Assinatura da função"))
 
-        if client and client:supports_method("textDocument/inlayHint") then
+        if client and client:supports_method("textDocument/inlayHint", buf) then
             if client.name == "clangd" then
                 vim.lsp.inlay_hint.enable(true, { bufnr = buf })
             end
