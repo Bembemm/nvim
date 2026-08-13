@@ -18,7 +18,7 @@ local clangd_cmd = executable.find({
     title = "LSP C++",
 })
 
-if lua_ls_cmd then
+if executable.available(lua_ls_cmd) then
     vim.lsp.config("lua_ls", {
         cmd = { lua_ls_cmd },
         filetypes = { "lua" },
@@ -39,7 +39,7 @@ if lua_ls_cmd then
     vim.lsp.enable("lua_ls")
 end
 
-if clangd_cmd then
+if executable.available(clangd_cmd) then
     vim.lsp.config("clangd", {
         cmd = {
             clangd_cmd,
