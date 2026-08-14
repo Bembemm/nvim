@@ -116,29 +116,293 @@ Iosevka Nerd Font 14
 
 ## Plugins
 
-| Plugin | Função |
-|---|---|
-| **blink.cmp + blink.lib** | completion, snippets, path, buffer e LSP |
-| **nvim-treesitter** | parsing, highlight e indentação |
-| **conform.nvim** | formatação automática |
-| **nvim-dap** | cliente Debug Adapter Protocol |
-| **nvim-dap-view** | interface visual de debugging |
-| **snacks.nvim** | dashboard, picker, grep, recentes, comandos, notificações e imagens |
-| **oil.nvim** | explorer baseado em buffers |
-| **harpoon** | acesso rápido a arquivos frequentes |
-| **gitsigns.nvim** | sinais e preview de alterações Git |
-| **todo-comments.nvim** | TODO/FIX/HACK/etc. |
-| **which-key.nvim** | organização e descoberta dos keymaps |
-| **indent-blankline.nvim** | guias de indentação |
-| **lualine.nvim** | statusline |
-| **nvim-web-devicons** | ícones de arquivos |
-| **mini.nvim** | `mini.pairs` |
-| **smear-cursor.nvim** | animação do cursor entre posições, buffers e janelas |
-| **nvim-surround** | manipulação de delimitadores |
-| **monokai_remastered.nvim** | colorscheme |
-| **plenary.nvim** | dependência do Harpoon 2 |
+Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`. A configuração evita sobreposição
+desnecessária: cada plugin tem uma responsabilidade específica e, quando possível, integra-se às APIs nativas do
+Neovim.
 
-O Smear Cursor inicia ativo com a configuração padrão e pode ser alternado com `:SmearCursorToggle`.
+### Visão rápida
+
+| Categoria | Plugins |
+|---|---|
+| **Completion e código** | Blink.cmp, blink.lib, nvim-treesitter, conform.nvim |
+| **Debug** | nvim-dap, nvim-dap-view |
+| **Navegação** | snacks.nvim, oil.nvim, Harpoon 2 |
+| **Git** | gitsigns.nvim |
+| **Edição** | mini.pairs, nvim-surround, todo-comments.nvim |
+| **Interface** | Which-Key, indent-blankline, Lualine, nvim-web-devicons, Smear Cursor |
+| **Tema** | Monokai Remastered |
+| **Bibliotecas** | plenary.nvim |
+
+### Completion e código
+
+#### Blink.cmp
+
+É o motor de completion da configuração. Ele reúne em uma única interface sugestões vindas de:
+
+- LSP;
+- caminhos de arquivos;
+- snippets;
+- conteúdo do buffer.
+
+A configuração também habilita signature help, documentação automática e ícones/tipos no menu de completion.
+Quando `clangd` ou `lua-language-server` estão conectados pelo LSP nativo, suas sugestões entram no Blink pela
+source `lsp`.
+
+#### blink.lib
+
+Biblioteca usada pelo Blink.cmp v2. Ela faz parte da infraestrutura do sistema de completion e não possui
+configuração separada neste repositório.
+
+#### nvim-treesitter
+
+Fornece parsing baseado em árvores sintáticas para highlight e indentação.
+
+Os parsers instalados atualmente são:
+
+```text
+lua
+c
+cpp
+vim
+vimdoc
+query
+```
+
+A configuração inicia o Treesitter através da API nativa `vim.treesitter.start()` quando um desses filetypes é
+aberto e usa o `indentexpr` fornecido pelo próprio nvim-treesitter.
+
+#### conform.nvim
+
+Centraliza a formatação automática dos arquivos.
+
+Nesta configuração:
+
+```text
+Lua     → StyLua
+C / C++ → clang-format
+```
+
+A formatação acontece ao salvar. Caso o formatter externo não esteja disponível e o servidor LSP ofereça
+formatação, o Conform pode usar o LSP como fallback.
+
+### Debug
+
+#### nvim-dap
+
+Implementa o cliente Debug Adapter Protocol usado para debugging de C++.
+
+A configuração procura `lldb-dap` e usa `lldb-vscode` como fallback. Quando um adapter está disponível, existem
+fluxos para:
+
+- executar um programa C++;
+- anexar a um processo;
+- criar breakpoints;
+- criar breakpoints condicionais;
+- step into, step over e step out;
+- continuar ou encerrar a execução;
+- abrir o REPL.
+
+Os comandos ficam agrupados em `<leader>d`.
+
+#### nvim-dap-view
+
+É a interface visual sobre o `nvim-dap`. Exibe informações da sessão de debug como scopes, variáveis,
+breakpoints, threads e REPL.
+
+Na configuração atual a interface abre e fecha automaticamente junto da sessão, possui controles no winbar e
+mostra valores através de virtual text inline.
+
+### Navegação
+
+#### snacks.nvim
+
+É o principal conjunto de ferramentas de interface e navegação da configuração.
+
+Atualmente o Snacks fornece:
+
+- dashboard;
+- picker de arquivos;
+- grep;
+- arquivos recentes;
+- lista de buffers;
+- busca de comandos;
+- lista de projetos;
+- status Git no dashboard;
+- notificações;
+- visualização de imagens.
+
+O dashboard usa `lua/core/dashboard.lua` para obter informações do sistema e mantém a parte visual separada da
+coleta das métricas.
+
+Principais atalhos:
+
+```text
+<leader>.d  dashboard
+<leader>ff  arquivos
+<leader>fg  grep
+<leader>fr  recentes
+<leader>fc  comandos
+<leader>fp  todos os pickers
+<leader>bb  buffers
+<leader>i   visualizar imagem
+```
+
+#### oil.nvim
+
+Substitui o explorador de arquivos padrão por uma interface baseada em buffers.
+
+Diretórios podem ser navegados como buffers normais do Neovim, mantendo a experiência próxima da edição de
+texto. Arquivos ocultos são exibidos por padrão.
+
+```text
+<leader>o  → abrir Oil
+```
+
+#### Harpoon 2
+
+Mantém uma pequena lista de arquivos escolhidos para acesso rápido durante o trabalho atual.
+
+Ele complementa o picker do Snacks: o Snacks serve para **encontrar** arquivos, enquanto o Harpoon serve para
+**voltar imediatamente** aos arquivos que já foram escolhidos como importantes.
+
+```text
+<leader>ha      adicionar arquivo
+<leader>hm      abrir menu
+<leader>hn      próximo
+<leader>hp      anterior
+<C-e>           menu rápido
+<C-1>…<C-4>     abrir itens 1 a 4
+```
+
+O menu também permite abrir um item em split horizontal ou vertical.
+
+### Git
+
+#### gitsigns.nvim
+
+Integra informações do Git diretamente aos buffers.
+
+Mostra sinais no gutter indicando linhas adicionadas, modificadas ou removidas e fornece preview do hunk atual:
+
+```text
+<leader>gp  → preview do hunk
+```
+
+O plugin trabalha no nível do buffer e complementa o status Git exibido pelo dashboard do Snacks.
+
+### Edição
+
+#### mini.nvim / mini.pairs
+
+O repositório `mini.nvim` é usado somente através do módulo `mini.pairs`.
+
+Ele insere pares automaticamente durante a digitação em Insert mode, como parênteses, colchetes e aspas. O
+recurso fica desabilitado em Command mode e Terminal mode.
+
+#### nvim-surround
+
+Trabalha com delimitadores ao redor de texto já existente.
+
+Ele permite adicionar, trocar ou remover surrounds como:
+
+- `(...)`;
+- `[...]`;
+- `{...}`;
+- aspas;
+- outros delimitadores e estruturas suportadas pelo plugin.
+
+Ele complementa o `mini.pairs`: o `mini.pairs` cria pares enquanto o texto é digitado, enquanto o
+`nvim-surround` modifica os delimitadores de texto que já existe.
+
+#### todo-comments.nvim
+
+Destaca comentários especiais como `TODO`, `FIX`, `HACK` e similares.
+
+A busca desses comentários é integrada ao picker do Snacks:
+
+```text
+<leader>ft  → buscar TODOs
+```
+
+Assim, o plugin cuida da identificação dos comentários e o Snacks cuida da interface de busca.
+
+### Interface
+
+#### which-key.nvim
+
+Organiza e apresenta os grupos de keymaps associados ao Leader.
+
+Os principais grupos são:
+
+```text
+<leader>b  Buffers
+<leader>d  Debug
+<leader>f  Find
+<leader>g  Git
+<leader>h  Harpoon
+<leader>l  LSP
+<leader>p  Plugins
+```
+
+A interface usa o preset `modern`, bordas arredondadas e delay de 200 ms.
+
+#### indent-blankline.nvim
+
+Exibe guias visuais de indentação e do escopo atual.
+
+As cores dos níveis não são fixadas diretamente em HEX; os highlights são ligados a grupos do colorscheme
+ativo, como `DiagnosticError`, `Type`, `String`, `Function` e `Statement`. Isso mantém as guias coerentes com a
+paleta do tema.
+
+#### lualine.nvim
+
+Fornece a statusline.
+
+A configuração é propositalmente pequena: ícones ficam habilitados e `theme = "auto"` faz a Lualine acompanhar o
+colorscheme ativo.
+
+#### nvim-web-devicons
+
+Fornece ícones para arquivos e elementos da interface usados por outros componentes da configuração.
+
+A variante escura e os ícones coloridos ficam habilitados. A configuração pressupõe o uso de uma Nerd Font.
+
+#### smear-cursor.nvim
+
+Adiciona uma animação visual ao movimento do cursor entre posições, buffers e janelas.
+
+Ele inicia com a configuração padrão e não interfere nas funcionalidades de edição. Pode ser alternado com:
+
+```vim
+:SmearCursorToggle
+```
+
+### Tema
+
+#### monokai_remastered.nvim
+
+Fornece o colorscheme **Monokai Remastered**.
+
+A configuração usa a paleta `classic`, habilita itálicos e faz uma pequena alteração na cor `brown`. Outros
+elementos, como a Lualine e os números de linha dependentes do modo, reutilizam essa identidade visual.
+
+### Bibliotecas
+
+#### plenary.nvim
+
+Biblioteca Lua utilizada como dependência na stack do Harpoon 2.
+
+Ela não possui configuração própria neste repositório: fica disponível apenas como infraestrutura para plugins
+que precisem dela.
+
+### Código nativo relacionado
+
+Dois arquivos em `plugin/` não correspondem a plugins externos:
+
+- `plugin/lsp.lua` configura diretamente o LSP nativo do Neovim para Lua e C/C++;
+- `plugin/mode-line-numbers.lua` muda a cor dos números de linha conforme o modo atual do Neovim.
+
+Isso mantém funcionalidades que já existem no Neovim fora de dependências adicionais.
 
 ---
 
@@ -500,7 +764,7 @@ O colorscheme é **Monokai Remastered** com `termguicolors`, background escuro e
 
 ---
 
-## Plugins
+## Atualização de plugins
 
 Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`.
 
