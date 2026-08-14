@@ -36,3 +36,20 @@ jobs:
           NVIM_LOG_FILE=/tmp/nvim.log nvim --headless --clean -u NONE \
             -c "lua local failed = false; for path, kind in vim.fs.dir('.', { depth = math.huge }) do if kind == 'file' and path:match('%.lua$') then local chunk, err = loadfile(path); if not chunk then vim.api.nvim_err_writeln(err); failed = true end end end; if failed then vim.cmd('cquit 1') end" \
             -c "quit"
+
+      - name: Install smoke-test dependencies
+        run: npm install --global tree-sitter-cli@0.26.1
+
+      - name: Smoke test full config
+        env:
+          XDG_CONFIG_HOME: ${{ runner.temp }}/nvim-config
+          XDG_DATA_HOME: ${{ runner.temp }}/nvim-data
+          XDG_STATE_HOME: ${{ runner.temp }}/nvim-state
+          XDG_CACHE_HOME: ${{ runner.temp }}/nvim-cache
+          NVIM_LOG_FILE: ${{ runner.temp }}/nvim-smoke.log
+        run: |
+          mkdir -p "$XDG_CONFIG_HOME"
+          ln -s "$GITHUB_WORKSPACE" "$XDG_CONFIG_HOME/nvim"
+          timeout 300 nvim --headless "$GITHUB_WORKSPACE/README.md" \
+            -c "lua assert(require('core.dashboard').header())" \
+            -c "qa"
