@@ -104,13 +104,6 @@ snacks.setup({
             function()
                 return { header = dashboard.header(), padding = 1, pane = 1 }
             end,
-            {
-                pane = 1,
-                section = "terminal",
-                cmd = "curl -s --max-time 3 'https://wttr.in/?0FQ' | sed 's/^/               /' || true",
-                height = 6,
-                ttl = 15 * 60,
-            },
             startup_item,
             { pane = 2, section = "keys", padding = 1 },
             {
