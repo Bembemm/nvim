@@ -52,6 +52,7 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 ├── README.md
 ├── lua/
 │   └── core/
+│       ├── dashboard.lua
 │       ├── keymaps.lua
 │       ├── options.lua
 │       └── plugins.lua
@@ -78,7 +79,7 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
     └── which-key.lua
 ```
 
-`init.lua` permanece pequeno de propósito. A declaração dos plugins fica centralizada em `lua/core/plugins.lua`, enquanto os arquivos em `plugin/` cuidam apenas da configuração de cada plugin.
+`init.lua` permanece pequeno de propósito. A declaração dos plugins fica centralizada em `lua/core/plugins.lua`, enquanto os arquivos em `plugin/` cuidam apenas da configuração de cada plugin. `lua/core/dashboard.lua` concentra a coleta e a formatação das informações do sistema usadas pelo dashboard do Snacks.
 
 ---
 
@@ -122,7 +123,7 @@ Iosevka Nerd Font 14
 | **conform.nvim** | formatação automática |
 | **nvim-dap** | cliente Debug Adapter Protocol |
 | **nvim-dap-view** | interface visual de debugging |
-| **snacks.nvim** | picker, grep, recentes, comandos, notificações e imagens |
+| **snacks.nvim** | dashboard, picker, grep, recentes, comandos, notificações e imagens |
 | **oil.nvim** | explorer baseado em buffers |
 | **harpoon** | acesso rápido a arquivos frequentes |
 | **gitsigns.nvim** | sinais e preview de alterações Git |
@@ -138,6 +139,26 @@ Iosevka Nerd Font 14
 | **plenary.nvim** | dependência do Harpoon 2 |
 
 O Smear Cursor inicia ativo com a configuração padrão e pode ser alternado com `:SmearCursorToggle`.
+
+---
+
+## Dashboard
+
+O dashboard do Snacks usa `lua/core/dashboard.lua` como fonte única para as informações do sistema. Ele detecta a distribuição Linux, versão do Neovim, CPU, RAM, swap, disco, uptime, bateria quando disponível, quantidade de processos e IP local.
+
+O rodapé mostra quantos plugins gerenciados pelo `vim.pack` estão ativos em relação ao total conhecido e o tempo gasto desde o início da configuração:
+
+```text
+⚡ Config loaded · ativos/total plugins · tempo
+```
+
+Esse tempo mede o carregamento da configuração a partir da primeira linha de `init.lua`; não pretende representar o startup completo do processo do Neovim.
+
+O dashboard também inclui atalhos, arquivos recentes, projetos, status Git, previsão do tempo e fallback para `rmatrix` quando disponível.
+
+```text
+<leader>.d  → abrir dashboard
+```
 
 ---
 
@@ -265,6 +286,7 @@ Em C++, os inlay hints do clangd são habilitados automaticamente e podem ser de
 
 | Keymap | Ação |
 |---|---|
+| `<leader>.d` | Abrir dashboard |
 | `<leader>o` | Abrir Oil |
 | `<leader>i` | Visualizar imagem |
 | `J` / `K` em visual | Mover seleção |
@@ -528,6 +550,18 @@ Verificações úteis:
 :checkhealth which-key
 :ConformInfo
 ```
+
+---
+
+## CI
+
+O workflow de CI executa três níveis de validação:
+
+1. `stylua --check .` para garantir a formatação Lua;
+2. carregamento de todos os arquivos `.lua` com `loadfile()` para detectar erros de sintaxe;
+3. um smoke test headless que inicia a configuração real com Neovim 0.12, instala os plugins via `vim.pack` e carrega um arquivo comum.
+
+O smoke test usa diretórios XDG temporários, portanto não depende de estado pré-existente do runner.
 
 ---
 
