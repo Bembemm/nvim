@@ -16,6 +16,7 @@ local function command(command)
     if vim.v.shell_error ~= 0 then
         return ""
     end
+
     return vim.trim(output)
 end
 
@@ -49,7 +50,9 @@ end
 
 local function os_info()
     local os_release = read_file("/etc/os-release") or ""
-    local pretty = os_release:match('PRETTY_NAME="([^"]+)"') or os_release:match("PRETTY_NAME=([^\n]+)") or "Linux"
+    local pretty = os_release:match('PRETTY_NAME="([^"]+)"')
+        or os_release:match("PRETTY_NAME=([^\n]+)")
+        or vim.uv.os_uname().sysname
     local id = (os_release:match("\nID=([^\n]+)") or os_release:match("^ID=([^\n]+)") or "linux"):gsub('"', "")
 
     local icons = {
@@ -69,38 +72,39 @@ local function nvim_version()
 end
 
 local function cpu_load()
-    local loadavg = read_file("/proc/loadavg") or ""
-    local load = tonumber(loadavg:match("^([%d%.]+)")) or 0
-    local cpu_count = math.max(#vim.uv.cpu_info(), 1)
-    return clamp((load / cpu_count) * 100, 0, 100)
+    local load = select(1, vim.uv.loadavg()) or 0
+    local cpu_count = vim.uv.available_parallelism and vim.uv.available_parallelism() or #vim.uv.cpu_info()
+    return clamp((load / math.max(cpu_count, 1)) * 100, 0, 100)
 end
 
 local function memory_info()
+    local total = vim.uv.get_total_memory and vim.uv.get_total_memory() or 0
+    local free = vim.uv.get_free_memory and vim.uv.get_free_memory() or 0
+    local used = math.max(total - free, 0)
     local meminfo = read_file("/proc/meminfo") or ""
-    local values = {}
+    local swap_total = tonumber(meminfo:match("SwapTotal:%s+(%d+)")) or 0
+    local swap_free = tonumber(meminfo:match("SwapFree:%s+(%d+)")) or 0
 
-    for key, value in meminfo:gmatch("([%w_()]+):%s+(%d+)") do
-        values[key] = tonumber(value) * 1024
-    end
+    swap_total = swap_total * 1024
+    swap_free = swap_free * 1024
 
-    local total = values.MemTotal or 0
-    local available = values.MemAvailable or 0
-    local used = math.max(total - available, 0)
-    local swap_total = values.SwapTotal or 0
-    local swap_free = values.SwapFree or 0
-    local swap_used = math.max(swap_total - swap_free, 0)
-
-    return used, total, swap_used, swap_total
+    return used, total, math.max(swap_total - swap_free, 0), swap_total
 end
 
 local function disk_info()
-    local line = command("df -B1 / | tail -1")
-    local total, used = line:match("^%S+%s+(%d+)%s+(%d+)")
-    return tonumber(used) or 0, tonumber(total) or 0
+    local ok, stat = pcall(vim.uv.fs_statfs, "/")
+    if not ok or not stat then
+        return 0, 0
+    end
+
+    local block_size = stat.frsize or stat.bsize or 1
+    local total = (stat.blocks or 0) * block_size
+    local available = (stat.bavail or stat.bfree or 0) * block_size
+    return math.max(total - available, 0), total
 end
 
 local function uptime()
-    local value = tonumber((read_file("/proc/uptime") or ""):match("^([%d%.]+)")) or 0
+    local value = vim.uv.uptime and vim.uv.uptime() or 0
     local days = math.floor(value / 86400)
     local hours = math.floor((value % 86400) / 3600)
     local minutes = math.floor((value % 3600) / 60)
@@ -134,7 +138,8 @@ local function process_count()
 end
 
 local function local_ip()
-    return command("hostname -I | awk '{print $1}'") ~= "" and command("hostname -I | awk '{print $1}'") or "offline"
+    local ip = command("hostname -I | awk '{print $1}'")
+    return ip ~= "" and ip or "offline"
 end
 
 local function system_info()
@@ -191,9 +196,17 @@ local function system_info()
 
     table.insert(
         lines,
-        string.format("│ SYSTEM  │ %-20s   %-5d  󰩠 %-12s │", vim.env.USER or "user", process_count(), local_ip())
+        string.format(
+            "│ SYSTEM  │ %-20s   %-5d  󰩠 %-12s │",
+            vim.env.USER or "user",
+            process_count(),
+            local_ip()
+        )
     )
-    table.insert(lines, "╰─────────┴──────────────────────────────────────────────╯")
+    table.insert(
+        lines,
+        "╰─────────┴──────────────────────────────────────────────╯"
+    )
 
     return lines
 end
