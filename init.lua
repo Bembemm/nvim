@@ -1,4 +1,4 @@
-vim.g.nvim_start_time = vim.uv.hrtime()
+vim.g.nvim_config_start_time = vim.uv.hrtime()
 
 -- 1. Otimizador de cache nativo (Liga o turbo)
 vim.loader.enable()
