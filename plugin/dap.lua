@@ -21,13 +21,12 @@ if lldb_dap_cmd ~= "" then
 
     dap.configurations.cpp = {
         {
-            name = "Executar programa C++",
+            name = "Build e depurar C++",
             type = "lldb",
             request = "launch",
-            program = function()
-                return vim.fn.input("Executável: ", vim.fn.getcwd() .. "/", "file")
-            end,
-            cwd = "${workspaceFolder}",
+            preLaunchTask = "C++ Build",
+            program = "${fileDirname}/${fileBasenameNoExtension}",
+            cwd = "${fileDirname}",
             stopOnEntry = false,
             runInTerminal = true,
         },
@@ -57,7 +56,7 @@ vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint, { desc = "Alternar brea
 vim.keymap.set("n", "<leader>dB", function()
     dap.set_breakpoint(vim.fn.input("Condição do breakpoint: "))
 end, { desc = "Breakpoint condicional" })
-vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "Continuar / iniciar" })
+vim.keymap.set("n", "<leader>dc", dap.continue, { desc = "Continuar / build e debug" })
 vim.keymap.set("n", "<leader>di", dap.step_into, { desc = "Step into" })
 vim.keymap.set("n", "<leader>do", dap.step_over, { desc = "Step over" })
 vim.keymap.set("n", "<leader>dO", dap.step_out, { desc = "Step out" })
