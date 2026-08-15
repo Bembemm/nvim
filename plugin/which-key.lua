@@ -19,6 +19,7 @@ wk.setup({
 
 wk.add({
     { "<leader>b", group = "Buffers" },
+    { "<leader>c", group = "Colors" },
     { "<leader>d", group = "Debug" },
     { "<leader>f", group = "Find" },
     { "<leader>g", group = "Git" },
