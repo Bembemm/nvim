@@ -18,6 +18,7 @@ vim.pack.add({
     "https://github.com/nvim-lualine/lualine.nvim",
     "https://github.com/echasnovski/mini.nvim",
     "https://github.com/stevearc/oil.nvim",
+    "https://github.com/stevearc/overseer.nvim",
     "https://github.com/folke/snacks.nvim",
     "https://github.com/sphamba/smear-cursor.nvim",
     "https://github.com/kylechui/nvim-surround",
