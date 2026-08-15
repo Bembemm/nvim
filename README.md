@@ -4,13 +4,14 @@
 
 **Uma configuração moderna, pequena e direta ao ponto.**
 
-Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Overseer · LLDB · Monokai Remastered
+Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Overseer · CCC · LLDB · Monokai Remastered
 
 ![Neovim](https://img.shields.io/badge/Neovim-0.12+-57A143?logo=neovim&logoColor=white)
 ![Lua](https://img.shields.io/badge/Lua-LuaJIT-2C2D72?logo=lua&logoColor=white)
 ![C++](https://img.shields.io/badge/C%2B%2B-clangd-00599C?logo=cplusplus&logoColor=white)
 ![Plugins](https://img.shields.io/badge/plugins-vim.pack-6E56CF)
 ![Build](https://img.shields.io/badge/build-Overseer-F7D51D)
+![Colors](https://img.shields.io/badge/colors-ccc.nvim-66D9EF)
 ![Debug](https://img.shields.io/badge/debug-LLDB-6E56CF)
 ![Theme](https://img.shields.io/badge/theme-Monokai%20Remastered-F4005F)
 [![CI](https://github.com/Bembemm/nvim/actions/workflows/ci.yml/badge.svg)](https://github.com/Bembemm/nvim/actions/workflows/ci.yml)
@@ -30,6 +31,7 @@ Blink       → completion
 LSP         → inteligência de código
 Treesitter  → parsing / highlight / indentação
 Conform     → formatação
+CCC         → visualização / edição / conversão de cores
 Overseer    → build / run / tasks
 DAP         → debugging
 ```
@@ -42,6 +44,7 @@ DAP         → debugging
 - LSP nativo com **`vim.lsp.config()`** e **`vim.lsp.enable()`**
 - Lua com **lua-language-server + StyLua**
 - C++ com **clangd + clang-format + Treesitter cpp**
+- cores com **ccc.nvim**
 - build e execução C++ com **Overseer + clang++**
 - debugging C++ com **nvim-dap + lldb-dap**
 - UI de debug com **nvim-dap-view**
@@ -70,6 +73,7 @@ DAP         → debugging
 │
 └── plugin/
     ├── blink.lua
+    ├── ccc.lua
     ├── colorscheme.lua
     ├── conform.lua
     ├── dap.lua
@@ -122,6 +126,8 @@ A GUI usa, quando disponível:
 Iosevka Nerd Font 14
 ```
 
+Quando o Neovim roda em um terminal, a fonte é controlada pelo próprio terminal.
+
 ---
 
 ## Plugins
@@ -131,6 +137,7 @@ Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`.
 | Categoria | Plugins |
 |---|---|
 | **Completion e código** | Blink.cmp, blink.lib, nvim-treesitter, conform.nvim |
+| **Cores** | ccc.nvim |
 | **Build / Run** | overseer.nvim |
 | **Debug** | nvim-dap, nvim-dap-view |
 | **Navegação** | snacks.nvim, oil.nvim, Harpoon 2 |
@@ -166,6 +173,64 @@ Formatação automática ao salvar:
 ```text
 Lua     → StyLua
 C / C++ → clang-format
+```
+
+---
+
+## Cores
+
+### ccc.nvim
+
+O CCC centraliza visualização, edição, criação e conversão de cores. O highlighter é ativado automaticamente e mostra um marcador colorido ao lado dos valores reconhecidos sem substituir a cor do texto.
+
+Exemplo:
+
+```text
+■ #f92672
+■ rgb(102 217 239)
+■ hsl(80 76% 53%)
+```
+
+A integração com o LSP fica habilitada. Quando um servidor fornece `textDocument/documentColor`, o CCC pode aproveitar essas informações; caso contrário, usa os próprios pickers para reconhecer formatos de cor.
+
+Espaços de cor disponíveis no picker:
+
+```text
+RGB
+HSL
+HWB
+Lab
+LCH
+OKLab
+OKLCH
+CMYK
+HSLuv
+OKHSL
+HSV
+OKHSV
+XYZ
+```
+
+Formatos de saída configurados:
+
+```text
+HEX / HEX curto
+CSS RGB / RGBA
+CSS HSL
+CSS HWB
+CSS Lab / LCH
+CSS OKLab / OKLCH
+Float
+```
+
+O alpha aparece automaticamente quando o formato suportar transparência. O estado do picker é preservado entre usos.
+
+Atalhos:
+
+```text
+<leader>cp  escolher / editar uma cor
+<leader>cc  converter formato da cor sob o cursor
+<leader>ct  ligar/desligar o highlighter
 ```
 
 ---
@@ -336,6 +401,7 @@ Os grupos são registrados centralmente:
 
 ```text
 <leader>b  Buffers
+<leader>c  Colors
 <leader>d  Debug
 <leader>f  Find
 <leader>g  Git
@@ -376,6 +442,14 @@ Para exibir apenas os keymaps locais do buffer:
 | `<leader><Right>` | Janela à direita |
 | `<C-w>w` | Próxima janela, atalho nativo |
 | `<Esc>` no terminal | Voltar ao Normal mode |
+
+## Colors — `<leader>c`
+
+| Keymap | Ação |
+|---|---|
+| `<leader>cp` | Escolher / editar cor |
+| `<leader>cc` | Converter formato da cor sob o cursor |
+| `<leader>ct` | Ligar/desligar destaque de cores |
 
 ## Find — `<leader>f`
 
@@ -673,6 +747,6 @@ Adicionar uma linguagem não significa instalar uma distribuição inteira de pl
 
 <div align="center">
 
-**Neovim · Lua · C++ · clangd · Overseer · LLDB · vim.pack · Blink · Snacks · Which-Key · Monokai Remastered**
+**Neovim · Lua · C++ · clangd · CCC · Overseer · LLDB · vim.pack · Blink · Snacks · Which-Key · Monokai Remastered**
 
 </div>
