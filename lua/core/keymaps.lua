@@ -8,6 +8,12 @@ keymap.set("n", "<leader>w", "<cmd>write<CR>", { desc = "Salvar arquivo" })
 keymap.set("n", "<leader>q", "<cmd>quit<CR>", { desc = "Sair" })
 keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Limpar busca" })
 
+-- Janelas
+keymap.set("n", "<leader><Left>", "<C-w>h", { desc = "Janela à esquerda" })
+keymap.set("n", "<leader><Down>", "<C-w>j", { desc = "Janela abaixo" })
+keymap.set("n", "<leader><Up>", "<C-w>k", { desc = "Janela acima" })
+keymap.set("n", "<leader><Right>", "<C-w>l", { desc = "Janela à direita" })
+
 -- Plugins
 keymap.set("n", "<leader>pu", function()
     vim.pack.update()
