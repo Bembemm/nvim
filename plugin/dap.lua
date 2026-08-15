@@ -67,10 +67,3 @@ vim.keymap.set("n", "<leader>du", dap_view.toggle, { desc = "Alternar DAP View" 
 vim.keymap.set({ "n", "v" }, "<leader>de", function()
     dap_view.hover()
 end, { desc = "Avaliar expressão" })
-
-vim.schedule(function()
-    local ok, wk = pcall(require, "which-key")
-    if ok then
-        wk.add({ { "<leader>d", group = "Debug" } })
-    end
-end)
