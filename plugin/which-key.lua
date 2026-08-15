@@ -24,6 +24,7 @@ wk.add({
     { "<leader>h", group = "Harpoon" },
     { "<leader>l", group = "LSP" },
     { "<leader>p", group = "Plugins" },
+    { "<leader>r", group = "Run" },
 })
 
 vim.keymap.set("n", "<leader>?", function()
