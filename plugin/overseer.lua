@@ -1,6 +1,6 @@
 local overseer = require("overseer")
 
-overseer.setup({})
+overseer.setup({ dap = true })
 
 local function cpp_context()
     local bufnr = vim.api.nvim_get_current_buf()
@@ -38,8 +38,8 @@ local function cpp_context()
     }
 end
 
-local function new_cpp_build_task(ctx)
-    return overseer.new_task({
+local function cpp_build_definition(ctx)
+    return {
         name = "C++ Build · " .. ctx.stem,
         cmd = {
             ctx.compiler,
@@ -59,8 +59,35 @@ local function new_cpp_build_task(ctx)
             "on_result_diagnostics",
             "default",
         },
-    })
+    }
 end
+
+local function failed_build_definition()
+    return {
+        name = "C++ Build",
+        cmd = { "false" },
+        components = { "default" },
+    }
+end
+
+local function new_cpp_build_task(ctx)
+    return overseer.new_task(cpp_build_definition(ctx))
+end
+
+overseer.register_template({
+    name = "C++ Build",
+    desc = "Compilar o arquivo C++ atual com clang++",
+    tags = { overseer.TAG.BUILD },
+    condition = { filetype = { "cpp" } },
+    builder = function()
+        local ctx = cpp_context()
+        if not ctx then
+            return failed_build_definition()
+        end
+
+        return cpp_build_definition(ctx)
+    end,
+})
 
 local function build_cpp()
     local ctx = cpp_context()
