@@ -4,12 +4,13 @@
 
 **Uma configuração moderna, pequena e direta ao ponto.**
 
-Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · LLDB · Monokai Remastered
+Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Overseer · LLDB · Monokai Remastered
 
 ![Neovim](https://img.shields.io/badge/Neovim-0.12+-57A143?logo=neovim&logoColor=white)
 ![Lua](https://img.shields.io/badge/Lua-LuaJIT-2C2D72?logo=lua&logoColor=white)
 ![C++](https://img.shields.io/badge/C%2B%2B-clangd-00599C?logo=cplusplus&logoColor=white)
 ![Plugins](https://img.shields.io/badge/plugins-vim.pack-6E56CF)
+![Build](https://img.shields.io/badge/build-Overseer-F7D51D)
 ![Debug](https://img.shields.io/badge/debug-LLDB-6E56CF)
 ![Theme](https://img.shields.io/badge/theme-Monokai%20Remastered-F4005F)
 [![CI](https://github.com/Bembemm/nvim/actions/workflows/ci.yml/badge.svg)](https://github.com/Bembemm/nvim/actions/workflows/ci.yml)
@@ -22,7 +23,7 @@ Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · LLDB · Monoka
 
 Esta configuração segue uma regra simples: **usar o máximo possível das APIs nativas do Neovim e adicionar plugins apenas quando eles resolvem um problema real**.
 
-As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada continua independente: LSP cuida da inteligência de código, Treesitter do parsing, Conform da formatação e DAP do debugging.
+As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada continua independente: LSP cuida da inteligência de código, Treesitter do parsing, Conform da formatação, Overseer de build/run e DAP do debugging.
 
 ### Stack
 
@@ -32,6 +33,7 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 - LSP nativo com **`vim.lsp.config()`** e **`vim.lsp.enable()`**
 - Lua com **lua-language-server + StyLua**
 - C++ com **clangd + clang-format + Treesitter cpp**
+- build e execução de C++ com **Overseer + clang++**
 - debugging C++ com **nvim-dap + lldb-dap**
 - UI de debug com **nvim-dap-view**
 - busca e navegação com **Snacks**
@@ -71,6 +73,7 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
     ├── mini.lua
     ├── mode-line-numbers.lua
     ├── oil.lua
+    ├── overseer.lua
     ├── smear-cursor.lua
     ├── snacks.lua
     ├── surround.lua
@@ -97,14 +100,12 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada contin
 | **StyLua** | formatação de Lua |
 | **clangd** | LSP para C++ |
 | **clang-format** | formatação de C++ |
+| **clang++** | build automático de C++ pelo Overseer |
 | **lldb-dap** | debugging de C++ |
-| **clang++ ou g++** | compilação de programas C++ |
 | **ripgrep (`rg`)** | grep e busca de TODOs |
 | **Nerd Font** | ícones da interface |
 
-As ferramentas externas devem estar disponíveis no `PATH`. Quando `lua-language-server`, `clangd` ou
-`lldb-dap`/`lldb-vscode` não são encontrados, a configuração continua iniciando e mostra uma notificação com o
-recurso que foi desativado.
+As ferramentas externas devem estar disponíveis no `PATH`. Quando `lua-language-server`, `clangd` ou `lldb-dap`/`lldb-vscode` não são encontrados, a configuração continua iniciando e mostra uma notificação com o recurso que foi desativado. O build C++ do Overseer requer `clang++`.
 
 A GUI usa, quando disponível:
 
@@ -116,15 +117,14 @@ Iosevka Nerd Font 14
 
 ## Plugins
 
-Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`. A configuração evita sobreposição
-desnecessária: cada plugin tem uma responsabilidade específica e, quando possível, integra-se às APIs nativas do
-Neovim.
+Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`. A configuração evita sobreposição desnecessária: cada plugin tem uma responsabilidade específica e, quando possível, integra-se às APIs nativas do Neovim.
 
 ### Visão rápida
 
 | Categoria | Plugins |
 |---|---|
 | **Completion e código** | Blink.cmp, blink.lib, nvim-treesitter, conform.nvim |
+| **Build / Run** | overseer.nvim |
 | **Debug** | nvim-dap, nvim-dap-view |
 | **Navegação** | snacks.nvim, oil.nvim, Harpoon 2 |
 | **Git** | gitsigns.nvim |
@@ -137,21 +137,13 @@ Neovim.
 
 #### Blink.cmp
 
-É o motor de completion da configuração. Ele reúne em uma única interface sugestões vindas de:
+É o motor de completion da configuração. Ele reúne em uma única interface sugestões vindas de LSP, caminhos de arquivos, snippets e conteúdo do buffer.
 
-- LSP;
-- caminhos de arquivos;
-- snippets;
-- conteúdo do buffer.
-
-A configuração também habilita signature help, documentação automática e ícones/tipos no menu de completion.
-Quando `clangd` ou `lua-language-server` estão conectados pelo LSP nativo, suas sugestões entram no Blink pela
-source `lsp`.
+A configuração também habilita signature help, documentação automática e ícones/tipos no menu de completion. Quando `clangd` ou `lua-language-server` estão conectados pelo LSP nativo, suas sugestões entram no Blink pela source `lsp`.
 
 #### blink.lib
 
-Biblioteca usada pelo Blink.cmp v2. Ela faz parte da infraestrutura do sistema de completion e não possui
-configuração separada neste repositório.
+Biblioteca usada pelo Blink.cmp v2. Ela faz parte da infraestrutura do sistema de completion e não possui configuração separada neste repositório.
 
 #### nvim-treesitter
 
@@ -168,22 +160,73 @@ vimdoc
 query
 ```
 
-A configuração inicia o Treesitter através da API nativa `vim.treesitter.start()` quando um desses filetypes é
-aberto e usa o `indentexpr` fornecido pelo próprio nvim-treesitter.
+A configuração inicia o Treesitter através da API nativa `vim.treesitter.start()` quando um desses filetypes é aberto e usa o `indentexpr` fornecido pelo próprio nvim-treesitter.
 
 #### conform.nvim
 
 Centraliza a formatação automática dos arquivos.
-
-Nesta configuração:
 
 ```text
 Lua     → StyLua
 C / C++ → clang-format
 ```
 
-A formatação acontece ao salvar. Caso o formatter externo não esteja disponível e o servidor LSP ofereça
-formatação, o Conform pode usar o LSP como fallback.
+A formatação acontece ao salvar. Caso o formatter externo não esteja disponível e o servidor LSP ofereça formatação, o Conform pode usar o LSP como fallback.
+
+### Build e execução
+
+#### overseer.nvim
+
+O Overseer é o task runner da configuração. Para exercícios C++ de arquivo único ele usa o `.cpp` aberto no buffer atual, salva o arquivo se houver alterações, chama `clang++` e gera o executável na mesma pasta com o mesmo nome sem a extensão.
+
+Exemplos:
+
+```text
+/home/user/teste/main.cpp   → /home/user/teste/main
+/tmp/learncpp/hello.cpp     → /tmp/learncpp/hello
+```
+
+Flags usadas no build:
+
+```text
+-std=c++20
+-Wall
+-Wextra
+-Wpedantic
+-g
+-O0
+```
+
+O fluxo de execução é:
+
+```text
+arquivo.cpp
+    ↓
+Overseer: C++ Build
+    ↓
+clang++
+    ↓
+    ├── falhou → Quickfix / diagnostics e para
+    └── sucesso
+           ↓
+      Overseer: C++ Run
+           ↓
+       executável
+```
+
+Atalhos:
+
+```text
+<leader>rb  build do C++ atual
+<leader>rr  build + run
+<leader>rt  escolher/executar uma task
+<leader>ru  abrir/fechar a lista de tasks
+<leader>rl  repetir a task mais recente
+```
+
+`<leader>rr` abre a saída do programa em um terminal horizontal dentro do Neovim. O terminal entra em Insert mode para permitir entrada com `std::cin`.
+
+A task registrada como **C++ Build** também é usada pelo DAP como `preLaunchTask`, permitindo build automático antes de iniciar uma nova sessão de debug.
 
 ### Debug
 
@@ -191,48 +234,46 @@ formatação, o Conform pode usar o LSP como fallback.
 
 Implementa o cliente Debug Adapter Protocol usado para debugging de C++.
 
-A configuração procura `lldb-dap` e usa `lldb-vscode` como fallback. Quando um adapter está disponível, existem
-fluxos para:
+A configuração procura `lldb-dap` e usa `lldb-vscode` como fallback. O fluxo principal de launch é **Build e depurar C++**:
 
-- executar um programa C++;
-- anexar a um processo;
-- criar breakpoints;
-- criar breakpoints condicionais;
-- step into, step over e step out;
-- continuar ou encerrar a execução;
-- abrir o REPL.
+```text
+<leader>dc
+    ↓
+Overseer: C++ Build
+    ↓
+clang++
+    ↓
+    ├── falhou → debugger não inicia
+    └── sucesso
+           ↓
+        lldb-dap
+           ↓
+          DAP
+```
 
-Os comandos ficam agrupados em `<leader>d`.
+O executável é resolvido automaticamente a partir do arquivo aberto:
+
+```text
+${fileDirname}/${fileBasenameNoExtension}
+```
+
+Assim não é necessário informar manualmente o caminho do executável a cada sessão.
+
+Também existe a configuração **Anexar a processo C++** para attach em um processo já em execução.
+
+O DAP fornece breakpoints, breakpoints condicionais, step into, step over, step out, continue, terminate e REPL. Os comandos ficam agrupados em `<leader>d`.
 
 #### nvim-dap-view
 
-É a interface visual sobre o `nvim-dap`. Exibe informações da sessão de debug como scopes, variáveis,
-breakpoints, threads e REPL.
+É a interface visual sobre o `nvim-dap`. Exibe informações da sessão de debug como scopes, variáveis, breakpoints, threads e REPL.
 
-Na configuração atual a interface abre e fecha automaticamente junto da sessão, possui controles no winbar e
-mostra valores através de virtual text inline.
+A interface abre e fecha automaticamente junto da sessão, possui controles no winbar e mostra valores através de virtual text inline.
 
 ### Navegação
 
 #### snacks.nvim
 
-É o principal conjunto de ferramentas de interface e navegação da configuração.
-
-Atualmente o Snacks fornece:
-
-- dashboard;
-- picker de arquivos;
-- grep;
-- arquivos recentes;
-- lista de buffers;
-- busca de comandos;
-- lista de projetos;
-- status Git no dashboard;
-- notificações;
-- visualização de imagens.
-
-O dashboard usa `lua/core/dashboard.lua` para obter informações do sistema e mantém a parte visual separada da
-coleta das métricas.
+É o principal conjunto de ferramentas de interface e navegação da configuração. Atualmente fornece dashboard, picker de arquivos, grep, arquivos recentes, lista de buffers, comandos, projetos, status Git, notificações e visualização de imagens.
 
 Principais atalhos:
 
@@ -249,10 +290,7 @@ Principais atalhos:
 
 #### oil.nvim
 
-Substitui o explorador de arquivos padrão por uma interface baseada em buffers.
-
-Diretórios podem ser navegados como buffers normais do Neovim, mantendo a experiência próxima da edição de
-texto. Arquivos ocultos são exibidos por padrão.
+Substitui o explorador de arquivos padrão por uma interface baseada em buffers. Arquivos ocultos são exibidos por padrão.
 
 ```text
 <leader>o  → abrir Oil
@@ -261,9 +299,6 @@ texto. Arquivos ocultos são exibidos por padrão.
 #### Harpoon 2
 
 Mantém uma pequena lista de arquivos escolhidos para acesso rápido durante o trabalho atual.
-
-Ele complementa o picker do Snacks: o Snacks serve para **encontrar** arquivos, enquanto o Harpoon serve para
-**voltar imediatamente** aos arquivos que já foram escolhidos como importantes.
 
 ```text
 <leader>ha      adicionar arquivo
@@ -280,59 +315,35 @@ O menu também permite abrir um item em split horizontal ou vertical.
 
 #### gitsigns.nvim
 
-Integra informações do Git diretamente aos buffers.
-
-Mostra sinais no gutter indicando linhas adicionadas, modificadas ou removidas e fornece preview do hunk atual:
+Integra informações do Git diretamente aos buffers e fornece preview do hunk atual:
 
 ```text
 <leader>gp  → preview do hunk
 ```
 
-O plugin trabalha no nível do buffer e complementa o status Git exibido pelo dashboard do Snacks.
-
 ### Edição
 
 #### mini.nvim / mini.pairs
 
-O repositório `mini.nvim` é usado somente através do módulo `mini.pairs`.
-
-Ele insere pares automaticamente durante a digitação em Insert mode, como parênteses, colchetes e aspas. O
-recurso fica desabilitado em Command mode e Terminal mode.
+O repositório `mini.nvim` é usado somente através do módulo `mini.pairs`. Ele insere pares automaticamente durante a digitação em Insert mode.
 
 #### nvim-surround
 
-Trabalha com delimitadores ao redor de texto já existente.
-
-Ele permite adicionar, trocar ou remover surrounds como:
-
-- `(...)`;
-- `[...]`;
-- `{...}`;
-- aspas;
-- outros delimitadores e estruturas suportadas pelo plugin.
-
-Ele complementa o `mini.pairs`: o `mini.pairs` cria pares enquanto o texto é digitado, enquanto o
-`nvim-surround` modifica os delimitadores de texto que já existe.
+Permite adicionar, trocar ou remover delimitadores ao redor de texto já existente.
 
 #### todo-comments.nvim
 
-Destaca comentários especiais como `TODO`, `FIX`, `HACK` e similares.
-
-A busca desses comentários é integrada ao picker do Snacks:
+Destaca comentários especiais como `TODO`, `FIX`, `HACK` e similares. A busca é integrada ao picker do Snacks:
 
 ```text
 <leader>ft  → buscar TODOs
 ```
-
-Assim, o plugin cuida da identificação dos comentários e o Snacks cuida da interface de busca.
 
 ### Interface
 
 #### which-key.nvim
 
 Organiza e apresenta os grupos de keymaps associados ao Leader.
-
-Os principais grupos são:
 
 ```text
 <leader>b  Buffers
@@ -342,36 +353,26 @@ Os principais grupos são:
 <leader>h  Harpoon
 <leader>l  LSP
 <leader>p  Plugins
+<leader>r  Run
 ```
 
 A interface usa o preset `modern`, bordas arredondadas e delay de 200 ms.
 
 #### indent-blankline.nvim
 
-Exibe guias visuais de indentação e do escopo atual.
-
-As cores dos níveis não são fixadas diretamente em HEX; os highlights são ligados a grupos do colorscheme
-ativo, como `DiagnosticError`, `Type`, `String`, `Function` e `Statement`. Isso mantém as guias coerentes com a
-paleta do tema.
+Exibe guias visuais de indentação e do escopo atual reutilizando highlights do colorscheme.
 
 #### lualine.nvim
 
-Fornece a statusline.
-
-A configuração é propositalmente pequena: ícones ficam habilitados e `theme = "auto"` faz a Lualine acompanhar o
-colorscheme ativo.
+Fornece a statusline, com ícones habilitados e tema integrado à paleta Monokai.
 
 #### nvim-web-devicons
 
-Fornece ícones para arquivos e elementos da interface usados por outros componentes da configuração.
-
-A variante escura e os ícones coloridos ficam habilitados. A configuração pressupõe o uso de uma Nerd Font.
+Fornece ícones para arquivos e elementos da interface. A configuração pressupõe o uso de uma Nerd Font.
 
 #### smear-cursor.nvim
 
-Adiciona uma animação visual ao movimento do cursor entre posições, buffers e janelas.
-
-Ele inicia com a configuração padrão e não interfere nas funcionalidades de edição. Pode ser alternado com:
+Adiciona animação visual ao movimento do cursor. Pode ser alternado com:
 
 ```vim
 :SmearCursorToggle
@@ -381,44 +382,19 @@ Ele inicia com a configuração padrão e não interfere nas funcionalidades de 
 
 #### monokai_remastered.nvim
 
-Fornece o colorscheme **Monokai Remastered**.
-
-A configuração usa a paleta `classic`, habilita itálicos e faz uma pequena alteração na cor `brown`. Outros
-elementos, como a Lualine e os números de linha dependentes do modo, reutilizam essa identidade visual.
+Fornece o colorscheme **Monokai Remastered** com a paleta `classic`, itálicos e pequenas customizações de cor.
 
 ### Bibliotecas
 
 #### plenary.nvim
 
-Biblioteca Lua utilizada como dependência na stack do Harpoon 2.
-
-Ela não possui configuração própria neste repositório: fica disponível apenas como infraestrutura para plugins
-que precisem dela.
-
-### Código nativo relacionado
-
-Dois arquivos em `plugin/` não correspondem a plugins externos:
-
-- `plugin/lsp.lua` configura diretamente o LSP nativo do Neovim para Lua e C/C++;
-- `plugin/mode-line-numbers.lua` muda a cor dos números de linha conforme o modo atual do Neovim.
-
-Isso mantém funcionalidades que já existem no Neovim fora de dependências adicionais.
+Biblioteca usada como infraestrutura pela stack do Harpoon 2.
 
 ---
 
 ## Dashboard
 
-O dashboard do Snacks usa `lua/core/dashboard.lua` como fonte única para as informações do sistema. Ele detecta a distribuição Linux, versão do Neovim, CPU, RAM, swap, disco, uptime, bateria quando disponível, quantidade de processos e IP local.
-
-O rodapé mostra quantos plugins gerenciados pelo `vim.pack` estão ativos em relação ao total conhecido e o tempo gasto desde o início da configuração:
-
-```text
-⚡ Config loaded · ativos/total plugins · tempo
-```
-
-Esse tempo mede o carregamento da configuração a partir da primeira linha de `init.lua`; não pretende representar o startup completo do processo do Neovim.
-
-O dashboard também inclui atalhos, arquivos recentes, projetos, status Git, previsão do tempo e fallback para `rmatrix` quando disponível.
+O dashboard do Snacks usa `lua/core/dashboard.lua` como fonte única para informações do sistema. O rodapé mostra quantos plugins gerenciados pelo `vim.pack` estão ativos e o tempo gasto desde o início da configuração.
 
 ```text
 <leader>.d  → abrir dashboard
@@ -438,9 +414,8 @@ A tecla **Leader é `Space`**.
 <leader>h  Harpoon
 <leader>l  LSP
 <leader>p  Plugins
+<leader>r  Run
 ```
-
-O Which-Key usa o preset `modern`, borda arredondada e delay de 200 ms.
 
 Para exibir apenas os keymaps locais do buffer:
 
@@ -460,6 +435,21 @@ Para exibir apenas os keymaps locais do buffer:
 | `<leader>q` | Sair |
 | `<Esc>` | Limpar highlight da busca |
 | `<leader>?` | Keymaps locais do buffer |
+
+## Janelas e terminal
+
+A configuração usa os keymaps nativos do Neovim para navegar entre splits:
+
+| Keymap | Ação |
+|---|---|
+| `<C-w>h` | Ir para a janela à esquerda |
+| `<C-w>j` | Ir para a janela abaixo |
+| `<C-w>k` | Ir para a janela acima |
+| `<C-w>l` | Ir para a janela à direita |
+| `<C-w>w` | Alternar para a próxima janela |
+| `<Esc>` no terminal | Voltar ao Normal mode |
+
+Quando o terminal do Overseer estiver em Insert mode, pressione `<Esc>` primeiro e depois use `<C-w>h/j/k/l` para trocar de janela.
 
 ## Find — `<leader>f`
 
@@ -524,13 +514,30 @@ Dentro do menu:
 
 Em C++, os inlay hints do clangd são habilitados automaticamente e podem ser desligados com `<leader>li`.
 
+## Run — `<leader>r`
+
+| Keymap | Ação |
+|---|---|
+| `<leader>rb` | Build do arquivo C++ atual |
+| `<leader>rr` | Build e executar o arquivo C++ atual |
+| `<leader>rt` | Escolher e executar uma task do Overseer |
+| `<leader>ru` | Abrir / fechar a lista de tasks do Overseer |
+| `<leader>rl` | Repetir a task mais recente |
+
+Para o uso diário em exercícios C++:
+
+```text
+<leader>rr  → quero compilar e rodar
+<leader>dc  → quero compilar e debugar
+```
+
 ## Debug — `<leader>d`
 
 | Keymap | Ação |
 |---|---|
 | `<leader>db` | Alternar breakpoint |
 | `<leader>dB` | Breakpoint condicional |
-| `<leader>dc` | Iniciar / continuar |
+| `<leader>dc` | Iniciar com Build automático / continuar sessão |
 | `<leader>de` | Avaliar expressão sob o cursor ou seleção |
 | `<leader>di` | Step into |
 | `<leader>do` | Step over |
@@ -556,18 +563,18 @@ Em C++, os inlay hints do clangd são habilitados automaticamente e podem ser de
 | `J` / `K` em visual | Mover seleção |
 | `<` / `>` em visual | Indentar mantendo seleção |
 | `D` em visual | Duplicar seleção |
-| `<Esc>` no terminal | Voltar ao Normal mode |
 
 ---
 
 ## C++
 
-O suporte C++ é dividido em quatro partes independentes:
+O suporte C++ é dividido em cinco partes independentes:
 
 ```text
 clangd        → LSP / diagnósticos / completion / navegação
 Treesitter    → parsing / highlight / indentação
 clang-format  → formatação
+Overseer      → build / run / tasks
 lldb-dap      → debugging
 ```
 
@@ -583,23 +590,9 @@ flags:
   --completion-style=detailed
 ```
 
-O filetype `c` também é aceito porque headers `.h` são detectados dessa forma pelo Neovim. Assim, esses headers
-continuam com clangd mesmo quando fazem parte de um projeto C++.
+O filetype `c` também é aceito porque headers `.h` são detectados dessa forma pelo Neovim. Não são forçados standard, includes ou defines globais no LSP; essas opções pertencem ao projeto e devem vir da compilação real.
 
-Não são forçados `-std=c++17`, `-std=c++20`, includes ou defines globais. Essas opções pertencem ao projeto e devem vir da compilação real.
-
-Para projetos C++ reais, prefira um `compile_commands.json`. O clangd usa essa base para entender includes, defines, standard da linguagem e demais flags do compilador.
-
-Com CMake:
-
-```bash
-cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-cmake --build build
-```
-
-O clangd procura `compile_commands.json` nos diretórios ancestrais do arquivo e também em diretórios `build/`.
-
-Projetos simples também podem usar `compile_flags.txt`. Para customizações compartilhadas específicas do clangd, use um arquivo `.clangd` no projeto.
+Para projetos C++ maiores, prefira um `compile_commands.json`. O clangd usa essa base para entender includes, defines, standard da linguagem e demais flags do compilador.
 
 ### Completion
 
@@ -607,18 +600,14 @@ Não existe configuração especial de completion para C++. O Blink já usa a so
 
 ### Inlay hints
 
-O clangd fornece hints como nomes de parâmetros e tipos deduzidos. Para C++, eles são ativados automaticamente pelo cliente nativo do Neovim.
-
 ```text
 <leader>li  → ligar/desligar hints
 ```
 
 ### Source / header
 
-O clangd possui uma extensão própria para alternar entre implementação e header correspondente:
-
 ```text
-<leader>lh
+<leader>lh  → alternar entre implementação e header correspondente
 ```
 
 ### Treesitter
@@ -634,9 +623,6 @@ vimdoc
 query
 ```
 
-Os parsers `c` e `cpp` são instalados para que headers `.h`, normalmente detectados como `c`, também tenham
-highlight e indentação via Treesitter.
-
 ### Formatação
 
 ```text
@@ -644,10 +630,7 @@ Lua     → StyLua
 C / C++ → clang-format
 ```
 
-O Conform executa `clang-format` ao salvar arquivos `c` ou `cpp`. O nome do arquivo é repassado ao formatter,
-portanto um `.clang-format` existente no projeto é respeitado.
-
-Se o formatter externo não estiver disponível, `lsp_format = "fallback"` permite usar a capacidade de formatação do LSP quando disponível.
+O Conform executa `clang-format` ao salvar arquivos `c` ou `cpp`. Um `.clang-format` existente no projeto é respeitado.
 
 Para inspecionar o formatter ativo:
 
@@ -655,36 +638,37 @@ Para inspecionar o formatter ativo:
 :ConformInfo
 ```
 
+### Build / Run
+
+Para exercícios C++ de arquivo único, o Overseer compila diretamente o buffer atual:
+
+```text
+main.cpp
+   ↓
+clang++ -std=c++20 -Wall -Wextra -Wpedantic -g -O0
+   ↓
+main
+```
+
+O executável fica na mesma pasta do source. O fluxo atual é propositalmente simples e adequado para exercícios de arquivo único. Projetos com múltiplos `.cpp` devem usar uma task de projeto/build system em vez de compilar somente o buffer atual.
+
 ### Debug
 
 ```text
-nvim-dap
-   ↓
-lldb-dap
-   ↓
-executável C++
-
-nvim-dap-view
-   ↓
-watches · scopes · breakpoints · threads · REPL
+Overseer: C++ Build
+        ↓
+     clang++
+        ↓
+     lldb-dap
+        ↓
+     nvim-dap
+        ↓
+  nvim-dap-view
 ```
 
-Há duas configurações:
+Ao iniciar uma nova sessão com `<leader>dc`, o DAP usa `preLaunchTask = "C++ Build"`. O Overseer salva e compila o `.cpp` atual; se o build falhar, o debugger não inicia. Se o build terminar com sucesso, o LLDB recebe automaticamente o executável correspondente ao arquivo aberto.
 
-- **Executar programa C++**;
-- **Anexar a processo C++**.
-
-Para gerar um executável adequado a debugging:
-
-```bash
-clang++ -g -O0 main.cpp -o main
-```
-
-ou:
-
-```bash
-g++ -g -O0 main.cpp -o main
-```
+Depois que a sessão já está ativa, `<leader>dc` volta ao comportamento normal de **Continue**.
 
 O DAP View abre e fecha automaticamente com a sessão, exibe controles no winbar e mostra variáveis com virtual text inline.
 
@@ -716,14 +700,7 @@ quote_style = "AutoPreferDouble"
 
 ## Diagnósticos
 
-A configuração global de diagnósticos usa:
-
-- virtual text;
-- signs;
-- underline;
-- ordenação por severidade;
-- float com borda arredondada;
-- atualização desativada durante Insert mode.
+A configuração global de diagnósticos usa virtual text, signs, underline, ordenação por severidade, float com borda arredondada e atualização desativada durante Insert mode.
 
 ---
 
@@ -744,31 +721,19 @@ timeoutlen           500 ms
 floating borders    rounded
 ```
 
-A numeração permanece absoluta (`1`, `2`, `3`...) em qualquer posição do cursor. A cor do gutter acompanha o
-modo atual usando a paleta Monokai:
-
-| Modo | Cor |
-|---|---|
-| Normal | aqua |
-| Insert | verde |
-| Visual / Select | roxo |
-| Replace | vermelho |
-| Command | laranja |
-| Terminal | amarelo |
+A numeração permanece absoluta em qualquer posição do cursor. A cor do gutter acompanha o modo atual usando a paleta Monokai.
 
 ---
 
 ## Tema
 
-O colorscheme é **Monokai Remastered** com `termguicolors`, background escuro e itálicos habilitados. A Lualine usa `theme = "auto"`, herdando a paleta ativa.
+O colorscheme é **Monokai Remastered** com `termguicolors`, background escuro e itálicos habilitados.
 
 ---
 
 ## Atualização de plugins
 
 Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`.
-
-Para atualizar:
 
 ```vim
 :packupdate
@@ -801,9 +766,9 @@ lua-language-server
 stylua
 clangd
 clang-format
+clang++
 lldb-dap
 rg
-clang++ ou g++
 ```
 
 Verificações úteis:
@@ -825,8 +790,6 @@ O workflow de CI executa três níveis de validação:
 2. carregamento de todos os arquivos `.lua` com `loadfile()` para detectar erros de sintaxe;
 3. um smoke test headless que inicia a configuração real com Neovim 0.12, instala os plugins via `vim.pack` e carrega um arquivo comum.
 
-O smoke test usa diretórios XDG temporários, portanto não depende de estado pré-existente do runner.
-
 ---
 
 ## Filosofia
@@ -840,6 +803,7 @@ Blink       → completion
 LSP         → inteligência de código
 Treesitter  → parsing / highlight / indentação
 Conform     → formatação
+Overseer    → build / run / tasks
 DAP         → debugging
 ```
 
@@ -849,6 +813,6 @@ Adicionar uma linguagem não significa instalar uma distribuição inteira de pl
 
 <div align="center">
 
-**Neovim · Lua · C++ · clangd · LLDB · vim.pack · Blink · Snacks · Which-Key · Monokai Remastered**
+**Neovim · Lua · C++ · clangd · Overseer · LLDB · vim.pack · Blink · Snacks · Which-Key · Monokai Remastered**
 
 </div>
