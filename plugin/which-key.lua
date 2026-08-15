@@ -19,12 +19,17 @@ wk.setup({
 
 wk.add({
     { "<leader>b", group = "Buffers" },
+    { "<leader>d", group = "Debug" },
     { "<leader>f", group = "Find" },
     { "<leader>g", group = "Git" },
     { "<leader>h", group = "Harpoon" },
     { "<leader>l", group = "LSP" },
     { "<leader>p", group = "Plugins" },
     { "<leader>r", group = "Run" },
+    { "<leader><Left>", desc = "Janela à esquerda" },
+    { "<leader><Down>", desc = "Janela abaixo" },
+    { "<leader><Up>", desc = "Janela acima" },
+    { "<leader><Right>", desc = "Janela à direita" },
 })
 
 vim.keymap.set("n", "<leader>?", function()
