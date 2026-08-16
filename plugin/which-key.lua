@@ -30,6 +30,7 @@ wk.add({
     { "<leader>n", group = "Noice" },
     { "<leader>p", group = "Plugins" },
     { "<leader>r", group = "Run" },
+    { "<leader>v", group = "Scrollview" },
     { "<leader>x", group = "Trouble" },
     { "<leader><Left>", desc = "Janela à esquerda" },
     { "<leader><Down>", desc = "Janela abaixo" },
