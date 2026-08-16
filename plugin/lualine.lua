@@ -59,7 +59,8 @@ local function overseer_state()
         return nil
     end
 
-    if task.status == overseer.STATUS.SUCCESS
+    if
+        task.status == overseer.STATUS.SUCCESS
         or task.status == overseer.STATUS.FAILURE
         or task.status == overseer.STATUS.CANCELED
     then
