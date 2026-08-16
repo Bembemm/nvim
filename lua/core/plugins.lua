@@ -21,6 +21,10 @@ vim.pack.add({
     "https://github.com/saecki/live-rename.nvim",
     "https://github.com/echasnovski/mini.nvim",
     "https://github.com/MunifTanjim/nui.nvim",
+    {
+        src = "https://github.com/nvim-neo-tree/neo-tree.nvim",
+        version = vim.version.range("3"),
+    },
     "https://github.com/folke/noice.nvim",
     "https://github.com/stevearc/oil.nvim",
     "https://github.com/stevearc/overseer.nvim",
