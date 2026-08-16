@@ -9,7 +9,6 @@ vim.pack.add({
         version = vim.version.range("1.*"),
     },
     "https://github.com/nvim-tree/nvim-web-devicons",
-    "https://codeberg.org/andyg/leap.nvim",
     "https://github.com/lewis6991/gitsigns.nvim",
     "https://github.com/nvim-lua/plenary.nvim",
     {
@@ -27,6 +26,5 @@ vim.pack.add({
     "https://github.com/folke/todo-comments.nvim",
     "https://github.com/nvim-treesitter/nvim-treesitter",
     "https://github.com/folke/which-key.nvim",
-    "https://github.com/tpope/vim-repeat",
     "https://github.com/njorquera98/monokai_remastered.nvim",
 })
