@@ -4,7 +4,7 @@
 
 **Uma configuração moderna, pequena e direta ao ponto.**
 
-Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Overseer · CCC · LLDB · Monokai Remastered
+Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Flash · Overseer · CCC · LLDB · Monokai Remastered
 
 ![Neovim](https://img.shields.io/badge/Neovim-0.12+-57A143?logo=neovim&logoColor=white)
 ![Lua](https://img.shields.io/badge/Lua-LuaJIT-2C2D72?logo=lua&logoColor=white)
@@ -30,6 +30,7 @@ As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada tem um
 Blink       → completion
 LSP         → inteligência de código
 Treesitter  → parsing / highlight / indentação
+Flash       → saltos / motions / navegação Treesitter
 Conform     → formatação
 CCC         → visualização / edição / conversão de cores
 Overseer    → build / run / tasks
@@ -49,6 +50,7 @@ DAP         → debugging
 - debugging C++ com **nvim-dap + lldb-dap**
 - UI de debug com **nvim-dap-view**
 - busca e navegação com **Snacks**
+- saltos rápidos no buffer e seleção estrutural com **Flash.nvim**
 - explorer com **Oil**
 - navegação rápida com **Harpoon 2**
 - atalhos organizados com **Which-Key v3**
@@ -78,6 +80,7 @@ DAP         → debugging
     ├── conform.lua
     ├── dap.lua
     ├── devicons.lua
+    ├── flash.lua
     ├── gitsigns.lua
     ├── harpoon.lua
     ├── indent.lua
@@ -140,7 +143,7 @@ Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`.
 | **Cores** | ccc.nvim |
 | **Build / Run** | overseer.nvim |
 | **Debug** | nvim-dap, nvim-dap-view |
-| **Navegação** | snacks.nvim, oil.nvim, Harpoon 2 |
+| **Navegação** | flash.nvim, snacks.nvim, oil.nvim, Harpoon 2 |
 | **Git** | gitsigns.nvim |
 | **Edição** | mini.pairs, nvim-surround, todo-comments.nvim |
 | **Interface** | Which-Key, indent-blankline, Lualine, nvim-web-devicons, Smear Cursor |
@@ -329,6 +332,21 @@ Exibe scopes, variáveis, breakpoints, threads, REPL e valores inline. A interfa
 
 ## Navegação
 
+### Flash.nvim
+
+O Flash complementa o Snacks e o Harpoon com saltos rápidos para qualquer posição visível no código. Ele usa labels temporários para escolher o destino sem precisar percorrer o buffer com vários movimentos.
+
+Atalhos principais:
+
+```text
+s  Flash Jump
+S  Flash Treesitter
+```
+
+Os dois atalhos funcionam em Normal, Visual e Operator-pending mode. O modo Treesitter permite escolher ranges sintáticos ao redor do cursor, enquanto o Jump encontra destinos por texto e labels.
+
+O Flash também aprimora os motions nativos `f`, `F`, `t`, `T`, `;` e `,` usando o modo `char` padrão do plugin.
+
 ### Snacks
 
 Principais atalhos:
@@ -442,6 +460,15 @@ Para exibir apenas os keymaps locais do buffer:
 | `<leader><Right>` | Janela à direita |
 | `<C-w>w` | Próxima janela, atalho nativo |
 | `<Esc>` no terminal | Voltar ao Normal mode |
+
+## Flash
+
+| Keymap | Ação |
+|---|---|
+| `s` | Flash Jump |
+| `S` | Flash Treesitter |
+| `f` / `F` / `t` / `T` | Motions de caractere aprimorados pelo Flash |
+| `;` / `,` | Próximo / anterior destino do motion |
 
 ## Colors — `<leader>c`
 
@@ -559,6 +586,7 @@ Para exercícios C++:
 
 Não existem keymaps `Leader` duplicados na configuração atual. Alguns atalhos substituem comportamentos nativos de forma intencional:
 
+- `s` abre o Flash Jump e `S` abre o Flash Treesitter; para substituição nativa de texto continuam disponíveis motions equivalentes como `cl` e `cc`;
 - `<C-e>` em Normal mode abre o menu rápido do Harpoon em vez do scroll nativo;
 - `J`, `K` e `D` em Visual mode foram customizados para edição de seleção;
 - `K` em buffers com LSP anexado mostra hover/documentação.
@@ -747,6 +775,6 @@ Adicionar uma linguagem não significa instalar uma distribuição inteira de pl
 
 <div align="center">
 
-**Neovim · Lua · C++ · clangd · CCC · Overseer · LLDB · vim.pack · Blink · Snacks · Which-Key · Monokai Remastered**
+**Neovim · Lua · C++ · clangd · CCC · Overseer · LLDB · vim.pack · Blink · Snacks · Flash · Which-Key · Monokai Remastered**
 
 </div>
