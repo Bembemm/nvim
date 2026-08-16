@@ -11,6 +11,8 @@ local parsers = {
     "vim",
     "vimdoc",
     "query",
+    "bash",
+    "regex",
     "markdown",
     "markdown_inline",
 }
