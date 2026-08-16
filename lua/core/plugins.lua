@@ -40,5 +40,5 @@ vim.pack.add({
     "https://github.com/folke/trouble.nvim",
     "https://github.com/nvim-treesitter/nvim-treesitter",
     "https://github.com/folke/which-key.nvim",
-    "https://github.com/loctvl842/monokai-pro.nvim",
+    "https://github.com/navarasu/onedark.nvim",
 })
