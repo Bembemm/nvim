@@ -1,28 +1,20 @@
 local lualine = require("lualine")
-local colors = require("monokai").classic
+local monokai = require("monokai-pro")
 
-local bar_bg = colors.base2
-local surface = colors.base3
-local foreground = colors.base8
-local muted = colors.base5
+local function current_colors()
+    local palette = monokai.get_palette()
 
-local theme = {}
-for mode, accent in pairs({
-    normal = colors.aqua,
-    insert = colors.green,
-    visual = colors.purple,
-    replace = colors.red,
-    command = colors.orange,
-    terminal = colors.yellow,
-    inactive = muted,
-}) do
-    theme[mode] = {
-        a = { fg = bar_bg, bg = accent, gui = "bold" },
-        b = { fg = foreground, bg = surface },
-        c = { fg = foreground, bg = bar_bg },
-        x = { fg = foreground, bg = bar_bg },
-        y = { fg = foreground, bg = surface },
-        z = { fg = bar_bg, bg = accent, gui = "bold" },
+    return {
+        bar_bg = palette.dark2,
+        surface = palette.dark1,
+        foreground = palette.text,
+        muted = palette.dimmed3,
+        red = palette.accent1,
+        orange = palette.accent2,
+        yellow = palette.accent3,
+        green = palette.accent4,
+        aqua = palette.accent5,
+        purple = palette.accent6,
     }
 end
 
@@ -78,167 +70,201 @@ local overseer_icons = {
     CANCELED = "󰜺",
 }
 
-local overseer_colors = {
-    RUNNING = colors.yellow,
-    SUCCESS = colors.green,
-    FAILURE = colors.red,
-    CANCELED = muted,
-}
-
-local overseer_component = {
-    function()
-        local state = overseer_state()
-        if not state then
-            return ""
-        end
-
-        return string.format("%s %s", overseer_icons[state.status] or "󰑮", state.name)
-    end,
-    cond = function()
-        return overseer_state() ~= nil
-    end,
-    color = function()
-        local state = overseer_state()
-        return {
-            fg = state and overseer_colors[state.status] or muted,
-            gui = "bold",
-        }
-    end,
-}
-
 local function dap_active()
     local ok, dap = pcall(require, "dap")
     return ok and dap.session() ~= nil
 end
 
-local dap_component = {
-    function()
-        local dap = require("dap")
-        local status = dap.status()
+local function setup_lualine()
+    local colors = current_colors()
 
-        if status ~= "" then
-            return "󰃤 " .. status
-        end
-
-        return "󰃤 Debug"
-    end,
-    cond = dap_active,
-    color = { fg = colors.purple, gui = "bold" },
-}
-
-local macro_component = {
-    function()
-        local register = vim.fn.reg_recording()
-        return register ~= "" and (" @" .. register) or ""
-    end,
-    cond = function()
-        return vim.fn.reg_recording() ~= ""
-    end,
-    color = { fg = colors.red, gui = "bold" },
-}
-
-local filename = {
-    "filename",
-    path = 1,
-    shorting_target = 40,
-    symbols = {
-        modified = " ●",
-        readonly = " ",
-        unnamed = "[Sem nome]",
-        newfile = "[Novo]",
-    },
-    color = function()
-        return {
-            fg = vim.bo.modified and colors.yellow or foreground,
-            gui = "bold",
+    local theme = {}
+    for mode, accent in pairs({
+        normal = colors.aqua,
+        insert = colors.green,
+        visual = colors.purple,
+        replace = colors.red,
+        command = colors.orange,
+        terminal = colors.yellow,
+        inactive = colors.muted,
+    }) do
+        theme[mode] = {
+            a = { fg = colors.bar_bg, bg = accent, gui = "bold" },
+            b = { fg = colors.foreground, bg = colors.surface },
+            c = { fg = colors.foreground, bg = colors.bar_bg },
+            x = { fg = colors.foreground, bg = colors.bar_bg },
+            y = { fg = colors.foreground, bg = colors.surface },
+            z = { fg = colors.bar_bg, bg = accent, gui = "bold" },
         }
+    end
+
+    local overseer_colors = {
+        RUNNING = colors.yellow,
+        SUCCESS = colors.green,
+        FAILURE = colors.red,
+        CANCELED = colors.muted,
+    }
+
+    local overseer_component = {
+        function()
+            local state = overseer_state()
+            if not state then
+                return ""
+            end
+
+            return string.format("%s %s", overseer_icons[state.status] or "󰑮", state.name)
+        end,
+        cond = function()
+            return overseer_state() ~= nil
+        end,
+        color = function()
+            local state = overseer_state()
+            return {
+                fg = state and overseer_colors[state.status] or colors.muted,
+                gui = "bold",
+            }
+        end,
+    }
+
+    local dap_component = {
+        function()
+            local dap = require("dap")
+            local status = dap.status()
+
+            if status ~= "" then
+                return "󰃤 " .. status
+            end
+
+            return "󰃤 Debug"
+        end,
+        cond = dap_active,
+        color = { fg = colors.purple, gui = "bold" },
+    }
+
+    local macro_component = {
+        function()
+            local register = vim.fn.reg_recording()
+            return register ~= "" and (" @" .. register) or ""
+        end,
+        cond = function()
+            return vim.fn.reg_recording() ~= ""
+        end,
+        color = { fg = colors.red, gui = "bold" },
+    }
+
+    local filename = {
+        "filename",
+        path = 1,
+        shorting_target = 40,
+        symbols = {
+            modified = " ●",
+            readonly = " ",
+            unnamed = "[Sem nome]",
+            newfile = "[Novo]",
+        },
+        color = function()
+            return {
+                fg = vim.bo.modified and colors.yellow or colors.foreground,
+                gui = "bold",
+            }
+        end,
+    }
+
+    local branch = {
+        "branch",
+        icon = "",
+        color = { fg = colors.green, gui = "bold" },
+    }
+
+    local diff = {
+        "diff",
+        symbols = {
+            added = "+",
+            modified = "~",
+            removed = "-",
+        },
+        diff_color = {
+            added = { fg = colors.green },
+            modified = { fg = colors.yellow },
+            removed = { fg = colors.red },
+        },
+    }
+
+    local diagnostics = {
+        "diagnostics",
+        sources = { "nvim_diagnostic" },
+        symbols = {
+            error = " ",
+            warn = " ",
+            info = " ",
+            hint = "󰌵 ",
+        },
+        diagnostics_color = {
+            error = { fg = colors.red },
+            warn = { fg = colors.yellow },
+            info = { fg = colors.aqua },
+            hint = { fg = colors.purple },
+        },
+    }
+
+    local lsp_status = {
+        "lsp_status",
+        icon = "",
+        color = { fg = colors.aqua },
+    }
+
+    local filetype = {
+        "filetype",
+        color = { fg = colors.purple, gui = "bold" },
+    }
+
+    lualine.setup({
+        options = {
+            disabled_filetypes = {
+                statusline = { "dashboard", "alpha", "ministarter", "snacks_dashboard" },
+            },
+            icons_enabled = true,
+            theme = theme,
+            component_separators = { left = "│", right = "│" },
+            section_separators = { left = "", right = "" },
+            globalstatus = true,
+        },
+        sections = {
+            lualine_a = { "mode" },
+            lualine_b = { branch, diff },
+            lualine_c = { filename },
+            lualine_x = {
+                macro_component,
+                dap_component,
+                overseer_component,
+                diagnostics,
+                lsp_status,
+            },
+            lualine_y = {
+                filetype,
+                "progress",
+            },
+            lualine_z = { "location" },
+        },
+        inactive_sections = {
+            lualine_a = {},
+            lualine_b = {},
+            lualine_c = { "filename" },
+            lualine_x = { "location" },
+            lualine_y = {},
+            lualine_z = {},
+        },
+    })
+end
+
+local group = vim.api.nvim_create_augroup("LualineMonokaiPro", { clear = true })
+vim.api.nvim_create_autocmd("ColorScheme", {
+    group = group,
+    pattern = "monokai-pro",
+    callback = function()
+        vim.schedule(setup_lualine)
     end,
-}
-
-local branch = {
-    "branch",
-    icon = "",
-    color = { fg = colors.green, gui = "bold" },
-}
-
-local diff = {
-    "diff",
-    symbols = {
-        added = "+",
-        modified = "~",
-        removed = "-",
-    },
-    diff_color = {
-        added = { fg = colors.green },
-        modified = { fg = colors.yellow },
-        removed = { fg = colors.red },
-    },
-}
-
-local diagnostics = {
-    "diagnostics",
-    sources = { "nvim_diagnostic" },
-    symbols = {
-        error = " ",
-        warn = " ",
-        info = " ",
-        hint = "󰌵 ",
-    },
-    diagnostics_color = {
-        error = { fg = colors.red },
-        warn = { fg = colors.yellow },
-        info = { fg = colors.aqua },
-        hint = { fg = colors.purple },
-    },
-}
-
-local lsp_status = {
-    "lsp_status",
-    icon = "",
-    color = { fg = colors.aqua },
-}
-
-local filetype = {
-    "filetype",
-    color = { fg = colors.purple, gui = "bold" },
-}
-
-lualine.setup({
-    options = {
-        disabled_filetypes = {
-            statusline = { "dashboard", "alpha", "ministarter", "snacks_dashboard" },
-        },
-        icons_enabled = true,
-        theme = theme,
-        component_separators = { left = "│", right = "│" },
-        section_separators = { left = "", right = "" },
-        globalstatus = true,
-    },
-    sections = {
-        lualine_a = { "mode" },
-        lualine_b = { branch, diff },
-        lualine_c = { filename },
-        lualine_x = {
-            macro_component,
-            dap_component,
-            overseer_component,
-            diagnostics,
-            lsp_status,
-        },
-        lualine_y = {
-            filetype,
-            "progress",
-        },
-        lualine_z = { "location" },
-    },
-    inactive_sections = {
-        lualine_a = {},
-        lualine_b = {},
-        lualine_c = { "filename" },
-        lualine_x = { "location" },
-        lualine_y = {},
-        lualine_z = {},
-    },
 })
 
+setup_lualine()
 vim.o.laststatus = 3
