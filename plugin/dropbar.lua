@@ -1,7 +1,20 @@
 local dropbar = require("dropbar")
 local dropbar_api = require("dropbar.api")
 
-dropbar.setup()
+-- Keep startup compatible with older local Dropbar checkouts while vim.pack
+-- updates them to the current default branch. BufModifiedSet was removed in
+-- Neovim 0.13, so do not rely on that event here.
+dropbar.setup({
+    bar = {
+        update_events = {
+            buf = {
+                "FileChangedShellPost",
+                "TextChanged",
+                "ModeChanged",
+            },
+        },
+    },
+})
 
 vim.keymap.set("n", "<leader>;", dropbar_api.pick, {
     desc = "Dropbar escolher contexto",
