@@ -9,10 +9,7 @@ vim.pack.add({
         version = vim.version.range("1.*"),
     },
     "https://github.com/nvim-tree/nvim-web-devicons",
-    {
-        src = "https://github.com/Bekaboo/dropbar.nvim",
-        version = "v14.2.1",
-    },
+    "https://github.com/Bekaboo/dropbar.nvim",
     "https://github.com/lewis6991/gitsigns.nvim",
     "https://github.com/nvim-lua/plenary.nvim",
     {
