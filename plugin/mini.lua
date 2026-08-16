@@ -6,9 +6,14 @@ pairs.setup({
 })
 
 jump2d.setup({
+    labels = "asdfghjklqwertyuiopzxcvbnm",
     view = {
         dim = false,
         n_steps_ahead = 1,
+    },
+    allowed_windows = {
+        current = true,
+        not_current = true,
     },
     mappings = {
         start_jumping = "",
