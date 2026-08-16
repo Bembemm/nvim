@@ -18,6 +18,7 @@ vim.pack.add({
     },
     "https://github.com/lukas-reineke/indent-blankline.nvim",
     "https://github.com/nvim-lualine/lualine.nvim",
+    "https://github.com/saecki/live-rename.nvim",
     "https://github.com/echasnovski/mini.nvim",
     "https://github.com/MunifTanjim/nui.nvim",
     "https://github.com/folke/noice.nvim",
