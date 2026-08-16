@@ -24,6 +24,7 @@ wk.add({
     { "<leader>f", group = "Find" },
     { "<leader>g", group = "Git" },
     { "<leader>h", group = "Harpoon" },
+    { "<leader>j", group = "Jump" },
     { "<leader>l", group = "LSP" },
     { "<leader>p", group = "Plugins" },
     { "<leader>r", group = "Run" },
