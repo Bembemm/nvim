@@ -29,6 +29,7 @@ wk.add({
     { "<leader>l", group = "LSP" },
     { "<leader>p", group = "Plugins" },
     { "<leader>r", group = "Run" },
+    { "<leader>x", group = "Trouble" },
     { "<leader><Left>", desc = "Janela à esquerda" },
     { "<leader><Down>", desc = "Janela abaixo" },
     { "<leader><Up>", desc = "Janela acima" },
