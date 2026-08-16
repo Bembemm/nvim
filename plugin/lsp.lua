@@ -123,7 +123,9 @@ vim.api.nvim_create_autocmd("LspAttach", {
         vim.keymap.set("n", "K", vim.lsp.buf.hover, opts("Documentação"))
         vim.keymap.set("n", "<leader>la", vim.lsp.buf.code_action, opts("Code action"))
         vim.keymap.set("n", "<leader>ld", vim.diagnostic.open_float, opts("Diagnóstico da linha"))
-        vim.keymap.set("n", "<leader>lr", vim.lsp.buf.rename, opts("Renomear símbolo"))
+        vim.keymap.set("n", "<leader>lr", function()
+            require("live-rename").rename({ insert = true, cursorpos = -1 })
+        end, opts("Renomear símbolo ao vivo"))
         vim.keymap.set("n", "<leader>ls", vim.lsp.buf.signature_help, opts("Assinatura da função"))
 
         if client and client:supports_method("textDocument/inlayHint", buf) then
