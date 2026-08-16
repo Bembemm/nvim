@@ -1,5 +1,9 @@
 local leap = require("leap")
 
+-- Mantém o fluxo próximo ao Flash: quando houver vários destinos,
+-- o Leap espera a escolha explícita de um label em vez de auto-pular.
+leap.opts.safe_labels = ""
+
 leap.opts.preview = function(ch0, ch1, ch2)
     return not (ch1:match("%s") or (ch0:match("%a") and ch1:match("%a") and ch2:match("%a")))
 end
