@@ -28,7 +28,7 @@ vim.pack.add({
         src = "https://github.com/NStefan002/screenkey.nvim",
         version = "v2.4.2",
     },
-    "https://github.com/lewis6991/satellite.nvim",
+    "https://github.com/dstein64/nvim-scrollview",
     "https://github.com/folke/snacks.nvim",
     "https://github.com/sphamba/smear-cursor.nvim",
     "https://github.com/kylechui/nvim-surround",
