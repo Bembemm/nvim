@@ -62,6 +62,11 @@ snacks.setup({
         enabled = true,
         width = 56,
         pane_gap = 4,
+        formats = {
+            file = function(item)
+                return { vim.fs.basename(item.file), hl = "file" }
+            end,
+        },
         preset = {
             keys = {
                 { icon = " ", key = "n", desc = "New File", action = ":ene" },
