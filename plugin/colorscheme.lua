@@ -1,4 +1,5 @@
 local monokai = require("monokai-pro")
+local blend = require("monokai-pro.colors.blend")
 
 monokai.setup({
     transparent_background = false,
@@ -25,6 +26,8 @@ monokai.setup({
 
 local function apply_custom_highlights()
     local palette = monokai.get_palette()
+    local gutter_bg = blend.blend(palette.dimmed5, 0.32, palette.background)
+    local separator = blend.blend(palette.dimmed3, 0.48, palette.background)
 
     local indent_colors = {
         SnacksIndentRed = palette.accent1,
@@ -41,6 +44,15 @@ local function apply_custom_highlights()
 
     vim.api.nvim_set_hl(0, "SnacksIndentScope", { fg = palette.accent5 })
     vim.api.nvim_set_hl(0, "SnacksIndentChunk", { fg = palette.accent6, bold = true })
+
+    -- Give the editor gutter its own visual surface instead of blending into code.
+    vim.api.nvim_set_hl(0, "SignColumn", { bg = gutter_bg })
+    vim.api.nvim_set_hl(0, "CursorLineSign", { bg = gutter_bg })
+    vim.api.nvim_set_hl(0, "FoldColumn", { fg = palette.dimmed3, bg = gutter_bg })
+    vim.api.nvim_set_hl(0, "CursorLineFold", { fg = palette.dimmed2, bg = gutter_bg })
+
+    -- Keep split/sidebar boundaries visible without turning them into bright borders.
+    vim.api.nvim_set_hl(0, "WinSeparator", { fg = separator, bg = palette.background })
 end
 
 vim.cmd.colorscheme("monokai-pro")
