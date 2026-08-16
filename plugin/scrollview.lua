@@ -12,6 +12,7 @@ scrollview.setup({
         "snacks_input",
         "Trouble",
         "oil",
+        "neo-tree",
         "noice",
         "notify",
         "help",
