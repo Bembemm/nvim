@@ -15,7 +15,7 @@ blink.setup({
         default = { "lsp", "path", "snippets", "buffer" },
     },
 
-    signature = { enabled = true },
+    signature = { enabled = false },
 
     completion = {
         documentation = {
