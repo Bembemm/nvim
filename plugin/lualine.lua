@@ -1,20 +1,20 @@
 local lualine = require("lualine")
-local monokai = require("monokai-pro")
 
 local function current_colors()
-    local palette = monokai.get_palette()
+    local colors = require("onedark.colors")
 
     return {
-        bar_bg = palette.dark2,
-        surface = palette.dark1,
-        foreground = palette.text,
-        muted = palette.dimmed3,
-        red = palette.accent1,
-        orange = palette.accent2,
-        yellow = palette.accent3,
-        green = palette.accent4,
-        aqua = palette.accent5,
-        purple = palette.accent6,
+        bar_bg = colors.bg_d,
+        surface = colors.bg1,
+        foreground = colors.fg,
+        muted = colors.grey,
+        red = colors.red,
+        orange = colors.orange,
+        yellow = colors.yellow,
+        green = colors.green,
+        aqua = colors.cyan,
+        blue = colors.blue,
+        purple = colors.purple,
     }
 end
 
@@ -257,10 +257,10 @@ local function setup_lualine()
     })
 end
 
-local group = vim.api.nvim_create_augroup("LualineMonokaiPro", { clear = true })
+local group = vim.api.nvim_create_augroup("LualineOneDark", { clear = true })
 vim.api.nvim_create_autocmd("ColorScheme", {
     group = group,
-    pattern = "monokai-pro",
+    pattern = "onedark",
     callback = function()
         vim.schedule(setup_lualine)
     end,
