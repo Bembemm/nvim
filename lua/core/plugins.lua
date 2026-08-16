@@ -28,6 +28,7 @@ vim.pack.add({
     "https://github.com/sphamba/smear-cursor.nvim",
     "https://github.com/kylechui/nvim-surround",
     "https://github.com/folke/todo-comments.nvim",
+    "https://github.com/folke/trouble.nvim",
     "https://github.com/nvim-treesitter/nvim-treesitter",
     "https://github.com/folke/which-key.nvim",
     "https://github.com/njorquera98/monokai_remastered.nvim",
