@@ -11,6 +11,8 @@ local parsers = {
     "vim",
     "vimdoc",
     "query",
+    "markdown",
+    "markdown_inline",
 }
 
 treesitter.install(parsers):wait(300000)
