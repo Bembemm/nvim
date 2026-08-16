@@ -4,7 +4,7 @@
 
 **Uma configuração moderna, pequena e direta ao ponto.**
 
-Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Flash · Overseer · CCC · LLDB · Monokai Remastered
+Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Leap · mini.jump2d · Overseer · CCC · LLDB · Monokai Remastered
 
 ![Neovim](https://img.shields.io/badge/Neovim-0.12+-57A143?logo=neovim&logoColor=white)
 ![Lua](https://img.shields.io/badge/Lua-LuaJIT-2C2D72?logo=lua&logoColor=white)
@@ -27,14 +27,15 @@ Esta configuração segue uma regra simples: **usar o máximo possível das APIs
 As linguagens configuradas atualmente são **Lua** e **C++**. Cada camada tem uma responsabilidade clara:
 
 ```text
-Blink       → completion
-LSP         → inteligência de código
-Treesitter  → parsing / highlight / indentação
-Flash       → saltos / motions / navegação Treesitter
-Conform     → formatação
-CCC         → visualização / edição / conversão de cores
-Overseer    → build / run / tasks
-DAP         → debugging
+Blink        → completion
+LSP          → inteligência de código
+Treesitter   → parsing / highlight / indentação
+Leap         → saltos search-first / motions / remote / Treesitter
+mini.jump2d  → saltos label-first em pontos visíveis
+Conform      → formatação
+CCC          → visualização / edição / conversão de cores
+Overseer     → build / run / tasks
+DAP          → debugging
 ```
 
 ### Stack
@@ -49,10 +50,11 @@ DAP         → debugging
 - build e execução C++ com **Overseer + clang++**
 - debugging C++ com **nvim-dap + lldb-dap**
 - UI de debug com **nvim-dap-view**
-- busca e navegação com **Snacks**
-- saltos rápidos no buffer e seleção estrutural com **Flash.nvim**
+- busca de arquivos/texto com **Snacks**
+- saltos rápidos search-first, cross-window, remote e Treesitter com **Leap.nvim**
+- saltos label-first por palavra, linha, caractere ou query com **mini.jump2d**
 - explorer com **Oil**
-- navegação rápida com **Harpoon 2**
+- navegação entre arquivos frequentes com **Harpoon 2**
 - atalhos organizados com **Which-Key v3**
 - animação do cursor com **Smear Cursor**
 - tema **Monokai Remastered**
@@ -80,10 +82,10 @@ DAP         → debugging
     ├── conform.lua
     ├── dap.lua
     ├── devicons.lua
-    ├── flash.lua
     ├── gitsigns.lua
     ├── harpoon.lua
     ├── indent.lua
+    ├── leap.lua
     ├── lsp.lua
     ├── lualine.lua
     ├── mini.lua
@@ -143,12 +145,12 @@ Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`.
 | **Cores** | ccc.nvim |
 | **Build / Run** | overseer.nvim |
 | **Debug** | nvim-dap, nvim-dap-view |
-| **Navegação** | flash.nvim, snacks.nvim, oil.nvim, Harpoon 2 |
+| **Navegação** | leap.nvim, mini.jump2d, snacks.nvim, oil.nvim, Harpoon 2 |
 | **Git** | gitsigns.nvim |
 | **Edição** | mini.pairs, nvim-surround, todo-comments.nvim |
 | **Interface** | Which-Key, indent-blankline, Lualine, nvim-web-devicons, Smear Cursor |
 | **Tema** | Monokai Remastered |
-| **Bibliotecas** | plenary.nvim |
+| **Bibliotecas / helpers** | plenary.nvim, vim-repeat |
 
 ### Completion e código
 
@@ -332,20 +334,115 @@ Exibe scopes, variáveis, breakpoints, threads, REPL e valores inline. A interfa
 
 ## Navegação
 
-### Flash.nvim
-
-O Flash complementa o Snacks e o Harpoon com saltos rápidos para qualquer posição visível no código. Ele usa labels temporários para escolher o destino sem precisar percorrer o buffer com vários movimentos.
-
-Atalhos principais:
+A navegação rápida foi dividida em duas ferramentas complementares:
 
 ```text
-s  Flash Jump
-S  Flash Treesitter
+Leap.nvim
+    → escolha o alvo por caracteres e salte
+    → direção / cross-window
+    → operações remotas
+    → seleção estrutural com Treesitter
+
+mini.jump2d
+    → olhe para o destino
+    → mostre labels em pontos visíveis
+    → escolha palavra / linha / caractere / query / spots padrão
 ```
 
-Os dois atalhos funcionam em Normal, Visual e Operator-pending mode. O modo Treesitter permite escolher ranges sintáticos ao redor do cursor, enquanto o Jump encontra destinos por texto e labels.
+Essa divisão mantém cada interação simples e evita depender de um único mecanismo para todos os tipos de movimento.
 
-O Flash também aprimora os motions nativos `f`, `F`, `t`, `T`, `;` e `,` usando o modo `char` padrão do plugin.
+### Leap.nvim
+
+O Leap é o motion principal search-first. A configuração usa o repositório oficial atual no Codeberg e aplica um filtro de preview para reduzir ruído visual em matches pouco úteis, como whitespace e posições no meio de palavras.
+
+#### Salto principal
+
+```text
+s  Leap no buffer atual
+```
+
+Funciona em **Normal**, **Visual** e **Operator-pending**.
+
+Exemplo:
+
+```text
+s → digitar o alvo → escolher o label
+```
+
+#### Operações remotas
+
+```text
+gs  Leap remote
+gS  Leap remote linewise
+R   Leap remote line, em Operator-pending
+ar  remote text object externo
+ir  remote text object interno
+```
+
+`gs` e `gS` ficam apenas nos modos em que não conflitam com os mappings existentes. `R` é registrado somente em Operator-pending.
+
+#### Treesitter
+
+```text
+an  selecionar nó Treesitter
+```
+
+Disponível em **Visual** e **Operator-pending**. Durante a seleção, `n` e `N` podem ser usados para atravessar os candidatos estruturais.
+
+O antigo `S` do Flash não foi reaproveitado: isso preserva o `S` do `nvim-surround` em Visual mode e também evita substituir mais um comando nativo.
+
+#### Direção e múltiplas janelas — `<leader>j`
+
+```text
+<leader>jw  Leap a partir de outra janela
+<leader>ja  Leap em todas as janelas
+<leader>jf  Leap para frente
+<leader>jb  Leap para trás
+<leader>jF  Leap para frente, parando antes do alvo
+<leader>jB  Leap para trás, parando depois do alvo
+<leader>jt  Leap até próximo do alvo
+```
+
+Os motions nativos `f`, `F`, `t`, `T`, `;` e `,` foram deixados intactos. Assim o Leap ganha seus recursos avançados sem roubar os movimentos básicos do Vim.
+
+### mini.jump2d
+
+O `mini.jump2d` faz a navegação label-first: primeiro os pontos de salto aparecem na tela; depois você escolhe o label do destino.
+
+A configuração usa labels priorizando a home row:
+
+```text
+asdfghjklqwertyuiopzxcvbnm
+```
+
+Também mostra uma etapa futura de labels (`n_steps_ahead = 1`) e permite saltos tanto na janela atual quanto nas outras janelas visíveis da tabpage.
+
+O mapping padrão `<CR>` do módulo foi desabilitado de propósito para não interferir em tags, help, quickfix e outros usos nativos do Enter.
+
+Todos os atalhos abaixo funcionam em **Normal**, **Visual** e **Operator-pending**:
+
+```text
+<leader>jj  labels nos inícios de palavras
+<leader>jl  labels nos inícios das linhas
+<leader>jc  pedir um caractere e marcar suas ocorrências
+<leader>jq  pedir uma query e marcar os matches
+<leader>jd  spots padrão do Jump2d
+```
+
+Os mappings usam a forma de comando recomendada para manter o comportamento correto em Operator-pending e permitir repetição quando aplicável.
+
+### Quando usar cada um
+
+```text
+Quero chegar a algo que sei digitar       → s / Leap
+Quero apenas olhar para um ponto e pular  → <leader>jj / mini.jump2d
+Quero início de uma linha                 → <leader>jl
+Quero todas as ocorrências de um char     → <leader>jc
+Quero procurar uma pequena query visível  → <leader>jq
+Quero operar em outro ponto               → gs / gS / ar / ir
+Quero selecionar estrutura sintática      → an
+Quero navegar entre janelas com labels    → <leader>ja ou Jump2d
+```
 
 ### Snacks
 
@@ -424,10 +521,13 @@ Os grupos são registrados centralmente:
 <leader>f  Find
 <leader>g  Git
 <leader>h  Harpoon
+<leader>j  Jump
 <leader>l  LSP
 <leader>p  Plugins
 <leader>r  Run
 ```
+
+O namespace `<leader>j` concentra os movimentos adicionais do Leap e os modos do `mini.jump2d`, enquanto `<leader>l` permanece reservado ao LSP.
 
 As ações de navegação com `Leader + setas` também aparecem no Which-Key.
 
@@ -461,14 +561,29 @@ Para exibir apenas os keymaps locais do buffer:
 | `<C-w>w` | Próxima janela, atalho nativo |
 | `<Esc>` no terminal | Voltar ao Normal mode |
 
-## Flash
+## Jump — Leap + mini.jump2d
 
 | Keymap | Ação |
 |---|---|
-| `s` | Flash Jump |
-| `S` | Flash Treesitter |
-| `f` / `F` / `t` / `T` | Motions de caractere aprimorados pelo Flash |
-| `;` / `,` | Próximo / anterior destino do motion |
+| `s` | Leap no buffer atual |
+| `gs` | Leap remote |
+| `gS` | Leap remote linewise |
+| `R` em Operator-pending | Leap remote em uma linha |
+| `ar` | Leap remote text object externo |
+| `ir` | Leap remote text object interno |
+| `an` | Selecionar nó Treesitter com Leap |
+| `<leader>jw` | Leap a partir de outra janela |
+| `<leader>ja` | Leap em todas as janelas |
+| `<leader>jf` | Leap para frente |
+| `<leader>jb` | Leap para trás |
+| `<leader>jF` | Leap para frente até antes do alvo |
+| `<leader>jB` | Leap para trás até depois do alvo |
+| `<leader>jt` | Leap próximo ao alvo |
+| `<leader>jj` | Jump2d em inícios de palavras |
+| `<leader>jl` | Jump2d em inícios de linhas |
+| `<leader>jc` | Jump2d por caractere |
+| `<leader>jq` | Jump2d por query |
+| `<leader>jd` | Jump2d com spots padrão |
 
 ## Colors — `<leader>c`
 
@@ -586,7 +701,11 @@ Para exercícios C++:
 
 Não existem keymaps `Leader` duplicados na configuração atual. Alguns atalhos substituem comportamentos nativos de forma intencional:
 
-- `s` abre o Flash Jump e `S` abre o Flash Treesitter; para substituição nativa de texto continuam disponíveis motions equivalentes como `cl` e `cc`;
+- `s` inicia o Leap em Normal, Visual e Operator-pending; para a substituição nativa de caractere continua disponível `cl`;
+- `gs`, `gS`, `ar`, `ir` e `an` são usados somente nos modos necessários às operações avançadas do Leap;
+- `S` não é usado pelo Leap, preservando o comportamento do `nvim-surround` em Visual mode e o comando nativo nos demais modos;
+- `f`, `F`, `t`, `T`, `;` e `,` continuam nativos;
+- o `<CR>` padrão do `mini.jump2d` está desativado para não interferir em tags/help/quickfix;
 - `<C-e>` em Normal mode abre o menu rápido do Harpoon em vez do scroll nativo;
 - `J`, `K` e `D` em Visual mode foram customizados para edição de seleção;
 - `K` em buffers com LSP anexado mostra hover/documentação.
@@ -775,6 +894,6 @@ Adicionar uma linguagem não significa instalar uma distribuição inteira de pl
 
 <div align="center">
 
-**Neovim · Lua · C++ · clangd · CCC · Overseer · LLDB · vim.pack · Blink · Snacks · Flash · Which-Key · Monokai Remastered**
+**Neovim · Lua · C++ · clangd · CCC · Overseer · LLDB · vim.pack · Blink · Snacks · Leap · mini.jump2d · Which-Key · Monokai Remastered**
 
 </div>
