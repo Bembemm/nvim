@@ -1,9 +1,4 @@
-local pairs = require("mini.pairs")
 local jump2d = require("mini.jump2d")
-
-pairs.setup({
-    modes = { insert = true, command = false, terminal = false },
-})
 
 jump2d.setup({
     labels = "asdfghjklqwertyuiopzxcvbnm",
