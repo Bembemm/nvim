@@ -143,6 +143,7 @@ snacks.setup({
         },
     },
     picker = { enabled = true },
+    input = { enabled = true },
     notifier = {
         enabled = true,
         timeout = 2500,
