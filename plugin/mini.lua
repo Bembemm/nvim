@@ -42,15 +42,3 @@ vim.keymap.set(
     "<Cmd>lua MiniJump2d.start(MiniJump2d.builtin_opts.single_character)<CR>",
     { silent = true, desc = "Jump2d caractere" }
 )
-
-vim.keymap.set(
-    modes,
-    "<leader>jq",
-    "<Cmd>lua MiniJump2d.start(MiniJump2d.builtin_opts.query)<CR>",
-    { silent = true, desc = "Jump2d consulta" }
-)
-
-vim.keymap.set(modes, "<leader>jd", "<Cmd>lua MiniJump2d.start()<CR>", {
-    silent = true,
-    desc = "Jump2d pontos padrão",
-})
