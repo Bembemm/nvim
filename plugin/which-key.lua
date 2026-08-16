@@ -27,6 +27,7 @@ wk.add({
     { "<leader>j", group = "Jump" },
     { "<leader>k", group = "Keys" },
     { "<leader>l", group = "LSP" },
+    { "<leader>n", group = "Noice" },
     { "<leader>p", group = "Plugins" },
     { "<leader>r", group = "Run" },
     { "<leader>x", group = "Trouble" },
