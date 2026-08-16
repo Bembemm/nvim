@@ -8,6 +8,7 @@ vim.pack.add({
         src = "https://github.com/igorlfs/nvim-dap-view",
         version = vim.version.range("1.*"),
     },
+    "https://github.com/windwp/nvim-autopairs",
     "https://github.com/nvim-tree/nvim-web-devicons",
     "https://github.com/Bekaboo/dropbar.nvim",
     "https://github.com/lewis6991/gitsigns.nvim",
@@ -16,7 +17,6 @@ vim.pack.add({
         src = "https://github.com/ThePrimeagen/harpoon",
         version = "harpoon2",
     },
-    "https://github.com/lukas-reineke/indent-blankline.nvim",
     "https://github.com/nvim-lualine/lualine.nvim",
     "https://github.com/saecki/live-rename.nvim",
     "https://github.com/echasnovski/mini.nvim",
@@ -36,5 +36,5 @@ vim.pack.add({
     "https://github.com/folke/trouble.nvim",
     "https://github.com/nvim-treesitter/nvim-treesitter",
     "https://github.com/folke/which-key.nvim",
-    "https://github.com/njorquera98/monokai_remastered.nvim",
+    "https://github.com/loctvl842/monokai-pro.nvim",
 })
