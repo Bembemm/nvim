@@ -1,15 +1,20 @@
-local palette = require("monokai").classic
+local monokai = require("monokai-pro")
 
-local colors = {
-    normal = palette.aqua,
-    insert = palette.green,
-    visual = palette.purple,
-    replace = palette.red,
-    command = palette.orange,
-    terminal = palette.yellow,
-}
+local function mode_colors()
+    local palette = monokai.get_palette()
+
+    return {
+        normal = palette.accent5,
+        insert = palette.accent4,
+        visual = palette.accent6,
+        replace = palette.accent1,
+        command = palette.accent2,
+        terminal = palette.accent3,
+    }
+end
 
 local function color_for_mode(mode)
+    local colors = mode_colors()
     local first = mode:sub(1, 1)
 
     if first == "i" then
