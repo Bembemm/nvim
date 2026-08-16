@@ -1,6 +1,15 @@
 local snacks = require("snacks")
 local dashboard = require("core.dashboard")
 
+local indent_highlights = {
+    "SnacksIndentRed",
+    "SnacksIndentOrange",
+    "SnacksIndentYellow",
+    "SnacksIndentGreen",
+    "SnacksIndentCyan",
+    "SnacksIndentPurple",
+}
+
 local function startup_item()
     local packs = vim.pack and vim.pack.get and vim.pack.get() or {}
     local active = 0
@@ -148,6 +157,44 @@ snacks.setup({
         enabled = true,
         timeout = 2500,
         style = "fancy",
+    },
+    indent = {
+        enabled = true,
+        indent = {
+            enabled = true,
+            char = "│",
+            hl = indent_highlights,
+            only_scope = false,
+            only_current = false,
+        },
+        animate = {
+            enabled = true,
+            style = "out",
+            easing = "linear",
+            duration = {
+                step = 20,
+                total = 300,
+            },
+        },
+        scope = {
+            enabled = true,
+            char = "│",
+            underline = false,
+            only_current = true,
+            hl = "SnacksIndentScope",
+        },
+        chunk = {
+            enabled = true,
+            only_current = true,
+            hl = "SnacksIndentChunk",
+            char = {
+                corner_top = "╭",
+                corner_bottom = "╰",
+                horizontal = "─",
+                vertical = "│",
+                arrow = ">",
+            },
+        },
     },
     image = {
         enabled = true,
