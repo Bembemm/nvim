@@ -1,4 +1,5 @@
 local monokai = require("monokai-pro")
+local blend = require("monokai-pro.colors.blend")
 
 local function mode_colors()
     local palette = monokai.get_palette()
@@ -41,10 +42,14 @@ local function color_for_mode(mode)
 end
 
 local function update_line_numbers()
+    local palette = monokai.get_palette()
     local color = color_for_mode(vim.api.nvim_get_mode().mode)
+    local gutter_bg = blend.blend(palette.dimmed5, 0.32, palette.background)
 
-    vim.api.nvim_set_hl(0, "LineNr", { fg = color })
-    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = color, bold = true })
+    vim.api.nvim_set_hl(0, "LineNr", { fg = color, bg = gutter_bg })
+    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = color, bg = gutter_bg, bold = true })
+    vim.api.nvim_set_hl(0, "LineNrAbove", { fg = color, bg = gutter_bg })
+    vim.api.nvim_set_hl(0, "LineNrBelow", { fg = color, bg = gutter_bg })
 end
 
 local group = vim.api.nvim_create_augroup("ModeLineNumbers", { clear = true })
