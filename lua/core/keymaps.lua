@@ -6,6 +6,7 @@ local keymap = vim.keymap
 -- Básicos
 keymap.set("n", "<leader>w", "<cmd>write<CR>", { desc = "Salvar arquivo" })
 keymap.set("n", "<leader>q", "<cmd>quit<CR>", { desc = "Sair" })
+keymap.set("n", "<leader>Q", "<cmd>qa!<CR>", { desc = "Sair forçado" })
 keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>", { silent = true, desc = "Limpar busca" })
 
 -- Janelas
