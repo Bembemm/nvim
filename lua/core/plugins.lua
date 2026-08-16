@@ -20,6 +20,10 @@ vim.pack.add({
     "https://github.com/echasnovski/mini.nvim",
     "https://github.com/stevearc/oil.nvim",
     "https://github.com/stevearc/overseer.nvim",
+    {
+        src = "https://github.com/NStefan002/screenkey.nvim",
+        version = "v2.4.2",
+    },
     "https://github.com/folke/snacks.nvim",
     "https://github.com/sphamba/smear-cursor.nvim",
     "https://github.com/kylechui/nvim-surround",
