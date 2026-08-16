@@ -1,16 +1,14 @@
-local monokai = require("monokai-pro")
-local blend = require("monokai-pro.colors.blend")
-
 local function mode_colors()
-    local palette = monokai.get_palette()
+    local colors = require("onedark.colors")
 
     return {
-        normal = palette.accent5,
-        insert = palette.accent4,
-        visual = palette.accent6,
-        replace = palette.accent1,
-        command = palette.accent2,
-        terminal = palette.accent3,
+        normal = colors.cyan,
+        insert = colors.green,
+        visual = colors.purple,
+        replace = colors.red,
+        command = colors.orange,
+        terminal = colors.yellow,
+        gutter = colors.bg_d,
     }
 end
 
@@ -42,14 +40,13 @@ local function color_for_mode(mode)
 end
 
 local function update_line_numbers()
-    local palette = monokai.get_palette()
+    local colors = mode_colors()
     local color = color_for_mode(vim.api.nvim_get_mode().mode)
-    local gutter_bg = blend.blend(palette.dimmed5, 0.32, palette.background)
 
-    vim.api.nvim_set_hl(0, "LineNr", { fg = color, bg = gutter_bg })
-    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = color, bg = gutter_bg, bold = true })
-    vim.api.nvim_set_hl(0, "LineNrAbove", { fg = color, bg = gutter_bg })
-    vim.api.nvim_set_hl(0, "LineNrBelow", { fg = color, bg = gutter_bg })
+    vim.api.nvim_set_hl(0, "LineNr", { fg = color, bg = colors.gutter })
+    vim.api.nvim_set_hl(0, "CursorLineNr", { fg = color, bg = colors.gutter, bold = true })
+    vim.api.nvim_set_hl(0, "LineNrAbove", { fg = color, bg = colors.gutter })
+    vim.api.nvim_set_hl(0, "LineNrBelow", { fg = color, bg = colors.gutter })
 end
 
 local group = vim.api.nvim_create_augroup("ModeLineNumbers", { clear = true })
@@ -61,6 +58,7 @@ vim.api.nvim_create_autocmd({ "ModeChanged", "WinEnter", "BufEnter" }, {
 
 vim.api.nvim_create_autocmd("ColorScheme", {
     group = group,
+    pattern = "onedark",
     callback = function()
         vim.schedule(update_line_numbers)
     end,
