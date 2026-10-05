@@ -136,6 +136,7 @@ A signature automática do Blink permanece desativada; a apresentação de signa
 ├── README.md
 ├── lua/
 │   └── core/
+│       ├── cpp.lua
 │       ├── dashboard.lua
 │       ├── keymaps.lua
 │       ├── options.lua
@@ -579,13 +580,15 @@ Atalhos:
 
 ### overseer.nvim
 
-Overseer é o task runner da configuração. Para exercícios C++ de arquivo único ele usa o `.cpp` aberto, salva o arquivo quando necessário, chama `clang++` e gera o executável na mesma pasta com o mesmo nome sem extensão.
+Overseer é o task runner da configuração. Para estudos e exercícios C++, ele detecta os arquivos `.cpp` na pasta atual. Se houver exatamente um `main()`, todos os `.cpp` daquela pasta são compilados juntos e o executável recebe o nome do arquivo que contém o `main()`. Se nenhum `main()` for detectado, apenas o arquivo aberto é compilado.
+
+Isso permite começar com um único arquivo e depois avançar para exercícios com vários arquivos sem trocar de workflow. Se houver mais de um `main()` na mesma pasta, o build é interrompido com um aviso; a convenção esperada é manter um programa/exercício por pasta.
 
 Exemplos:
 
 ```text
-/home/user/teste/main.cpp   → /home/user/teste/main
-/tmp/learncpp/hello.cpp     → /tmp/learncpp/hello
+hello.cpp                        → clang++ hello.cpp -o hello
+main.cpp + add.cpp + input.cpp  → clang++ main.cpp add.cpp input.cpp -o main
 ```
 
 Flags:
@@ -595,6 +598,8 @@ Flags:
 -Wall
 -Wextra
 -Wpedantic
+-Wconversion
+-Wsign-conversion
 -g
 -O0
 ```
@@ -602,7 +607,7 @@ Flags:
 Fluxo:
 
 ```text
-arquivo.cpp
+arquivo(s).cpp
     ↓
 Overseer: C++ Build
     ↓
@@ -655,11 +660,7 @@ clang++
           DAP
 ```
 
-O executável é resolvido a partir do arquivo aberto:
-
-```text
-${fileDirname}/${fileBasenameNoExtension}
-```
+O DAP usa a mesma resolução de programa do Overseer. Em exercícios com vários arquivos, ele depura o executável correspondente ao único arquivo que contém `main()`, evitando divergência entre build e debug.
 
 Também existe a configuração **Anexar a processo C++**.
 
@@ -918,14 +919,14 @@ Os hints do clangd são ligados automaticamente quando suportados.
 ### Build / Run
 
 ```text
-main.cpp
+main.cpp + outros .cpp da mesma pasta
    ↓
-clang++ -std=c++20 -Wall -Wextra -Wpedantic -g -O0
+clang++ -std=c++20 -Wall -Wextra -Wpedantic -Wconversion -Wsign-conversion -g -O0
    ↓
 main
 ```
 
-O executável fica na mesma pasta do source. Projetos com múltiplos `.cpp` devem usar uma task de projeto/build system em vez de compilar apenas o buffer atual.
+O executável fica na mesma pasta do arquivo que contém `main()`. Para exercícios do LearnCpp, a pasta funciona como a unidade do programa: um `main()` e os arquivos auxiliares daquele exercício. Quando o projeto passar a ter uma estrutura de build própria, como CMake, ela deve assumir essa responsabilidade.
 
 ### Debug
 
