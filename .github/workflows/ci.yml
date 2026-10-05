@@ -53,9 +53,3 @@ jobs:
           timeout 300 nvim --headless "$GITHUB_WORKSPACE/README.md" \
             -c "lua assert(require('core.dashboard').header())" \
             -c "qa"
-
-      - name: Print generated vim.pack lockfile
-        run: |
-          echo "__NVIM_PACK_LOCK_START__"
-          cat "$GITHUB_WORKSPACE/nvim-pack-lock.json"
-          echo "__NVIM_PACK_LOCK_END__"
