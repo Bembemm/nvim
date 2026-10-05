@@ -1,5 +1,6 @@
 local dap = require("dap")
 local dap_view = require("dap-view")
+local cpp = require("core.cpp")
 
 dap_view.setup({
     auto_toggle = true,
@@ -10,6 +11,16 @@ dap_view.setup({
 local lldb_dap_cmd = vim.fn.exepath("lldb-dap")
 if lldb_dap_cmd == "" then
     lldb_dap_cmd = vim.fn.exepath("lldb-vscode")
+end
+
+local function cpp_debug_context()
+    local ctx, err = cpp.context()
+    if not ctx then
+        vim.notify(err, vim.log.levels.ERROR, { title = "DAP" })
+        return nil
+    end
+
+    return ctx
 end
 
 if lldb_dap_cmd ~= "" then
@@ -25,8 +36,14 @@ if lldb_dap_cmd ~= "" then
             type = "lldb",
             request = "launch",
             preLaunchTask = "C++ Build",
-            program = "${fileDirname}/${fileBasenameNoExtension}",
-            cwd = "${fileDirname}",
+            program = function()
+                local ctx = cpp_debug_context()
+                return ctx and ctx.output or ""
+            end,
+            cwd = function()
+                local ctx = cpp_debug_context()
+                return ctx and ctx.dir or vim.fn.getcwd()
+            end,
             stopOnEntry = false,
             runInTerminal = true,
         },
