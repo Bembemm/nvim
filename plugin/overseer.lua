@@ -1,18 +1,14 @@
 local overseer = require("overseer")
+local cpp = require("core.cpp")
 
 overseer.setup({ dap = true })
 
 local function cpp_context()
     local bufnr = vim.api.nvim_get_current_buf()
+    local ctx, err = cpp.context(bufnr)
 
-    if vim.bo[bufnr].filetype ~= "cpp" then
-        vim.notify("Build disponível apenas para arquivos C++.", vim.log.levels.WARN, { title = "Overseer" })
-        return nil
-    end
-
-    local source = vim.api.nvim_buf_get_name(bufnr)
-    if source == "" then
-        vim.notify("Salve o arquivo .cpp antes de compilar.", vim.log.levels.WARN, { title = "Overseer" })
+    if not ctx then
+        vim.notify(err, vim.log.levels.WARN, { title = "Overseer" })
         return nil
     end
 
@@ -26,33 +22,31 @@ local function cpp_context()
         vim.cmd.update()
     end
 
-    local dir = vim.fs.dirname(source)
-    local stem = vim.fn.fnamemodify(source, ":t:r")
-
-    return {
-        compiler = compiler,
-        source = source,
-        dir = dir,
-        stem = stem,
-        output = vim.fs.joinpath(dir, stem),
-    }
+    ctx.compiler = compiler
+    return ctx
 end
 
 local function cpp_build_definition(ctx)
+    local cmd = {
+        ctx.compiler,
+        "-std=c++20",
+        "-Wall",
+        "-Wextra",
+        "-Wpedantic",
+        "-Wconversion",
+        "-Wsign-conversion",
+        "-g",
+        "-O0",
+    }
+
+    vim.list_extend(cmd, ctx.sources)
+    vim.list_extend(cmd, { "-o", ctx.output })
+
+    local source_label = ctx.multi_file and string.format("%d fontes", #ctx.sources) or "1 fonte"
+
     return {
-        name = "C++ Build · " .. ctx.stem,
-        cmd = {
-            ctx.compiler,
-            "-std=c++20",
-            "-Wall",
-            "-Wextra",
-            "-Wpedantic",
-            "-g",
-            "-O0",
-            ctx.source,
-            "-o",
-            ctx.output,
-        },
+        name = string.format("C++ Build · %s · %s", ctx.stem, source_label),
+        cmd = cmd,
         cwd = ctx.dir,
         components = {
             { "on_output_quickfix", open_on_match = true, set_diagnostics = true },
@@ -76,7 +70,7 @@ end
 
 overseer.register_template({
     name = "C++ Build",
-    desc = "Compilar o arquivo C++ atual com clang++",
+    desc = "Compilar o programa C++ atual com clang++",
     tags = { overseer.TAG.BUILD },
     condition = { filetype = { "cpp" } },
     builder = function()
@@ -142,7 +136,7 @@ local function restart_last_task()
     overseer.run_action(tasks[1], "restart")
 end
 
-vim.keymap.set("n", "<leader>rb", build_cpp, { desc = "Build C++ atual" })
+vim.keymap.set("n", "<leader>rb", build_cpp, { desc = "Build programa C++" })
 vim.keymap.set("n", "<leader>rr", build_and_run_cpp, { desc = "Build e executar C++" })
 vim.keymap.set("n", "<leader>rt", "<cmd>OverseerRun<CR>", { desc = "Executar tarefa" })
 vim.keymap.set("n", "<leader>ru", "<cmd>OverseerToggle<CR>", { desc = "Alternar tarefas" })
