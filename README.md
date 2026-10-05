@@ -4,7 +4,7 @@
 
 **Uma configuração moderna, poderosa e curada, com plugins especializados e uma UI limpa e coesa.**
 
-Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Noice · Gitsigns · Trouble · Overseer · LLDB · Monokai Pro
+Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Noice · Gitsigns · Trouble · Overseer · LLDB · OneDark Deep
 
 ![Neovim](https://img.shields.io/badge/Neovim-0.12+-57A143?logo=neovim&logoColor=white)
 ![Lua](https://img.shields.io/badge/Lua-LuaJIT-2C2D72?logo=lua&logoColor=white)
@@ -13,7 +13,7 @@ Lua · C++ · Neovim 0.12+ · `vim.pack` · Blink v2 · Snacks · Noice · Gitsi
 ![Build](https://img.shields.io/badge/build-Overseer-F7D51D)
 ![Debug](https://img.shields.io/badge/debug-LLDB-6E56CF)
 ![Git](https://img.shields.io/badge/git-Gitsigns-F05032?logo=git&logoColor=white)
-![Theme](https://img.shields.io/badge/theme-Monokai%20Pro-F4005F)
+![Theme](https://img.shields.io/badge/theme-OneDark%20Deep-282C34)
 [![CI](https://github.com/Bembemm/nvim/actions/workflows/ci.yml/badge.svg)](https://github.com/Bembemm/nvim/actions/workflows/ci.yml)
 
 </div>
@@ -118,7 +118,7 @@ A signature automática do Blink permanece desativada; a apresentação de signa
 - atalhos organizados com **Which-Key v3**
 - visualização de teclas com **Screenkey**
 - animação do cursor com **Smear Cursor**
-- tema **Monokai Pro**, filtro `classic`
+- tema **OneDark**, estilo `deep`
 
 ---
 
@@ -131,6 +131,7 @@ A signature automática do Blink permanece desativada; a apresentação de signa
 │       └── ci.yml
 ├── .gitignore
 ├── .stylua.toml
+├── nvim-pack-lock.json
 ├── init.lua
 ├── README.md
 ├── lua/
@@ -221,7 +222,7 @@ Todos os plugins são declarados com `vim.pack.add()` em `lua/core/plugins.lua`.
 | **Navegação** | mini.jump2d, Snacks, Oil, Harpoon 2, Dropbar |
 | **Interface** | Noice, Which-Key, Lualine, nvim-scrollview, Screenkey, nvim-web-devicons, Smear Cursor |
 | **Cores** | ccc.nvim |
-| **Tema** | monokai-pro.nvim |
+| **Tema** | onedark.nvim |
 | **Bibliotecas / helpers** | plenary.nvim, nui.nvim |
 
 ---
@@ -373,9 +374,9 @@ Funciona em Visual e Operator-pending, permitindo compor operações Vim com o h
 
 ## UI
 
-### Monokai Pro
+### OneDark Deep
 
-O tema principal é `monokai-pro` com filtro `classic`.
+O tema principal é `onedark.nvim` com estilo `deep`.
 
 A paleta do próprio tema é reutilizada por componentes customizados para manter a interface coerente. Entre eles:
 
@@ -387,12 +388,12 @@ A paleta do próprio tema é reutilizada por componentes customizados para mante
 Os números de linha mudam de cor conforme o modo atual:
 
 ```text
-Normal   → accent5
-Insert   → accent4
-Visual   → accent6
-Replace  → accent1
-Command  → accent2
-Terminal → accent3
+Normal   → cyan
+Insert   → green
+Visual   → purple
+Replace  → red
+Command  → orange
+Terminal → yellow
 ```
 
 Gitsigns pode sobrescrever localmente a cor do número nas linhas modificadas quando `numhl` está ativo, adicionando estado Git sem remover a identidade visual do restante do buffer.
@@ -465,7 +466,7 @@ progress
 location
 ```
 
-As cores são derivadas dinamicamente da paleta do Monokai Pro. O status do Overseer aparece apenas durante uma task ou por alguns segundos após sua conclusão; DAP aparece apenas durante uma sessão ativa.
+As cores são derivadas dinamicamente da paleta do OneDark. O status do Overseer aparece apenas durante uma task ou por alguns segundos após sua conclusão; DAP aparece apenas durante uma sessão ativa.
 
 ### Trouble
 
@@ -988,6 +989,8 @@ listchars            ligados
 
 ## Atualização de plugins
 
+O `nvim-pack-lock.json` é versionado junto com a configuração. Ele fixa as revisões resolvidas pelo `vim.pack`, garantindo que uma instalação nova use as mesmas versões dos plugins.
+
 ```vim
 :packupdate
 ```
@@ -998,7 +1001,7 @@ ou:
 <leader>pu
 ```
 
-O `init.lua` também observa mudanças no pacote do Treesitter e executa `TSUpdate` após instalação/atualização.
+Depois de revisar e aceitar uma atualização, inclua a alteração do `nvim-pack-lock.json` no mesmo commit. O `init.lua` também observa mudanças no pacote do Treesitter e executa `TSUpdate` após instalação/atualização.
 
 ---
 
@@ -1067,6 +1070,6 @@ A configuração favorece:
 
 <div align="center">
 
-**Neovim · Lua · C++ · clangd · Blink · Snacks · Noice · Gitsigns · Trouble · Dropbar · Overseer · LLDB · Monokai Pro**
+**Neovim · Lua · C++ · clangd · Blink · Snacks · Noice · Gitsigns · Trouble · Dropbar · Overseer · LLDB · OneDark Deep**
 
 </div>
